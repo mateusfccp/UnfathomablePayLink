@@ -1,0 +1,6 @@
+@unfathomable_pay_link_HostAddress = http://localhost:5059
+
+GET {{unfathomable_pay_link_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
