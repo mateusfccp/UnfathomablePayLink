@@ -8,11 +8,14 @@ namespace UnfathomablePayLink.Interfaces;
 /// <c>Business</c> and its details, so that they may be used to generate a
 /// <c>Payment</c>
 /// </summary>
-public interface IInvoiceRepository<T, I> where T : IInvoice<I>
+public interface IInvoiceRepository<T, I>
+    where T : IInvoice<I>
+    where I : notnull
 {
     /// <summary>
-    /// Gets an invoice from the provided ID.
+    /// Gets the invoice associated with the given ID.
     /// </summary>
     /// <param name="id">The ID of the invoice in its own <c>Business</c></param>
+    /// <returns>The invoice associated with the given ID.</returns>
     T GetInvoiceById(I id);
 }

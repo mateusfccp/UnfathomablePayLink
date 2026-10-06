@@ -5,7 +5,7 @@
 /// and an <c>Amount</c>.
 /// </summary>
 /// <typeparam name="I">The type of the ID in the invoice.</typeparam>
-public interface IInvoice<I>
+public interface IInvoice<I> where I : notnull
 {
     /// <summary>
     /// The unique identifier of the invoice within its <c>Business</c>.
