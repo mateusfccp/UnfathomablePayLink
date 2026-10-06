@@ -1,8 +1,9 @@
 /// <summary>
 /// An invoice in a <c>Business</c>.
-///
+/// <para>
 /// It requires, at a minimum, an <c>Id</c>, which may have any type <c>I</c>,
 /// and an <c>Amount</c>.
+/// </para>
 /// </summary>
 /// <typeparam name="I">The type of the ID in the invoice.</typeparam>
 public interface IInvoice<I> where I : notnull

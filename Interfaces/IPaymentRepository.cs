@@ -5,9 +5,10 @@ namespace UnfathomablePayLink.Interfaces;
 /// <summary>
 /// Interface <c>IInvoiceRepository</c> defines the interface of a payment
 /// repository.
-///
+/// <para>
 /// The interface describes the repository that provides the creation and update
 /// operations of payments in the system.
+/// </para>
 /// </summary>
 public interface IPaymentRepository
 {
@@ -20,10 +21,11 @@ public interface IPaymentRepository
 
     /// <summary>
     /// Gets all the payments associated with the given business and invoice.
-    ///
+    /// <para>
     /// It may return more than one payment because an invoice may have
     /// previously rejected payments, but it should have at most one approved or
     /// pending payment.
+    /// </para>
     /// </summary>
     /// <param name="businessId">
     /// The ID of the business from which to get the payments.
@@ -35,7 +37,6 @@ public interface IPaymentRepository
 
     /// <summary>
     /// Gets the last payment associated with the given business and invoice.
-    ///
     /// </summary>
     /// <param name="businessId">
     /// The ID of the business from which to get the payment.
