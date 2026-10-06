@@ -1,0 +1,29 @@
+@startuml
+
+entity Business {
+	* id : integer (generated)
+	--
+	* name : varchar
+	* identifier : varchar (unique)
+}
+
+entity Payment {
+	* id : number (generated)
+	--
+	* business_id : integer (FK)
+	* invoice_id : varchar
+	* amount : integer
+	* payment_state : integer (FK)
+	* paument_date : text
+}
+
+entity PaymentState {
+	* id : number (generated)
+	--
+	* name : string
+}
+
+Payment }o--|| Business
+Payment }o--|| PaymentState
+
+@enduml
