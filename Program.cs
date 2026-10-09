@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using unfathomable_pay_link.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Db context
+builder.Services.AddDbContext<PayLinkContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("PayLinkDb")));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

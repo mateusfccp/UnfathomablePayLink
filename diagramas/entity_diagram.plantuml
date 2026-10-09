@@ -14,7 +14,7 @@ entity Payment {
 	* invoice_id : varchar
 	* amount : integer
 	* payment_state : integer (FK)
-	* paument_date : text
+	* payment_date : text
 }
 
 entity PaymentState {
