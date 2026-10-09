@@ -33,6 +33,9 @@ namespace unfathomable_pay_link.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Document")
+                        .IsUnique();
+
                     b.ToTable("Businesses");
                 });
 

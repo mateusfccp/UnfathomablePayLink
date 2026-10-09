@@ -13,5 +13,7 @@ public class PayLinkContext(DbContextOptions<PayLinkContext> options) : DbContex
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Payment>().Property(e => e.state).HasConversion<string>();//Para hacer legible el estado en base de datos
+        modelBuilder.Entity<Business>()
+            .HasIndex(b => b.Document).IsUnique();
     }
 }
