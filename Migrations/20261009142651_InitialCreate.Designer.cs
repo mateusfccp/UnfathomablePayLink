@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using unfathomable_pay_link.Context;
+using UnfathomablePayLink.Context;
 
 #nullable disable
 
-namespace unfathomable_pay_link.Migrations
+namespace UnfathomablePayLink.Migrations
 {
     [DbContext(typeof(PayLinkContext))]
     [Migration("20261009142651_InitialCreate")]

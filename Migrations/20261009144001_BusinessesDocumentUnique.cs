@@ -1,28 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿namespace UnfathomablePayLink.Migrations;
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace unfathomable_pay_link.Migrations
+/// <inheritdoc />
+public partial class BusinessesDocumentUnique : Migration
 {
     /// <inheritdoc />
-    public partial class BusinessesDocumentUnique : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateIndex(
-                name: "IX_Businesses_Document",
-                table: "Businesses",
-                column: "Document",
-                unique: true);
-        }
+        migrationBuilder.CreateIndex(
+            name: "IX_Businesses_Document",
+            table: "Businesses",
+            column: "Document",
+            unique: true);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropIndex(
-                name: "IX_Businesses_Document",
-                table: "Businesses");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropIndex(
+            name: "IX_Businesses_Document",
+            table: "Businesses");
     }
 }
