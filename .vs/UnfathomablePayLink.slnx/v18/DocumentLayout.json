@@ -1,0 +1,105 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|c:\\users\\mathy\\downloads\\ing. en sistemas 2026\\segundo cuatrimestre\\programacion ii\\tp integrador\\unfathomablepaylink\\controllers\\businessescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|solutionrelative:controllers\\businessescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|c:\\users\\mathy\\downloads\\ing. en sistemas 2026\\segundo cuatrimestre\\programacion ii\\tp integrador\\unfathomablepaylink\\controllers\\paymentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|solutionrelative:controllers\\paymentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|c:\\users\\mathy\\downloads\\ing. en sistemas 2026\\segundo cuatrimestre\\programacion ii\\tp integrador\\unfathomablepaylink\\unfathomablepaylink.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|solutionrelative:unfathomablepaylink.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|c:\\users\\mathy\\downloads\\ing. en sistemas 2026\\segundo cuatrimestre\\programacion ii\\tp integrador\\unfathomablepaylink\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|c:\\users\\mathy\\downloads\\ing. en sistemas 2026\\segundo cuatrimestre\\programacion ii\\tp integrador\\unfathomablepaylink\\project_context.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{33325940-231E-A32A-01F9-A4D43A9FD70F}|UnfathomablePayLink.csproj|solutionrelative:project_context.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UnfathomablePayLink.http",
+              "DocumentMoniker": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\UnfathomablePayLink.http",
+              "RelativeDocumentMoniker": "UnfathomablePayLink.http",
+              "ToolTip": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\UnfathomablePayLink.http",
+              "RelativeToolTip": "UnfathomablePayLink.http",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwBkAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2026-10-26T21:31:45.098Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "project_context.txt",
+              "DocumentMoniker": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\project_context.txt",
+              "RelativeDocumentMoniker": "project_context.txt",
+              "ToolTip": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\project_context.txt",
+              "RelativeToolTip": "project_context.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-10-26T21:29:06.533Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABoAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T21:29:05.374Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BusinessesController.cs",
+              "DocumentMoniker": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\Controllers\\BusinessesController.cs",
+              "RelativeDocumentMoniker": "Controllers\\BusinessesController.cs",
+              "ToolTip": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\Controllers\\BusinessesController.cs",
+              "RelativeToolTip": "Controllers\\BusinessesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T21:28:17.226Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PaymentsController.cs",
+              "DocumentMoniker": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\Controllers\\PaymentsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PaymentsController.cs",
+              "ToolTip": "C:\\Users\\mathy\\Downloads\\Ing. en Sistemas 2026\\Segundo Cuatrimestre\\Programacion II\\TP INTEGRADOR\\UnfathomablePayLink\\Controllers\\PaymentsController.cs",
+              "RelativeToolTip": "Controllers\\PaymentsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T21:27:16.31Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

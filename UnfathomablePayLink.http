@@ -1,6 +1,26 @@
-@UnfathomablePayLink_HostAddress = http://localhost:5059
+@baseUrl = https://localhost:7123
 
-GET {{UnfathomablePayLink_HostAddress}}/weatherforecast/
+### 1. Get All Businesses
+GET {{baseUrl}}/api/businesses
 Accept: application/json
 
-###
+### 2. Create a Business
+POST {{baseUrl}}/api/businesses
+Content-Type: application/json
+
+{
+  "name": "Acme Corp",
+  "document": "12345678000199"
+}
+
+### 3. Get Payment by ID
+GET {{baseUrl}}/api/payments/1
+Accept: application/json
+
+### 4. Create Payment for Invoice
+POST {{baseUrl}}/api/payments/business/1/invoice/INV-2026-001
+Content-Type: application/json
+
+### 5. Get Latest Payment for Invoice
+GET {{baseUrl}}/api/payments/business/1/invoice/INV-2026-001/latest
+Accept: application/json
