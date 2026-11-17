@@ -16,8 +16,8 @@ public interface IPaymentRepository
     /// Gets the payment associated with given ID.
     /// </summary>
     /// <param name="id">The unique ID of the payment in the system.</param>
-    /// <returns>The payment associated with the given ID.</returns>
-    Task<Payment> GetPaymentById(int id);
+    /// <returns>The payment associated with the given ID, or null if not found.</returns>
+    Task<Payment?> GetPaymentById(int id);
 
     /// <summary>
     /// Gets all the payments associated with the given business and invoice.
@@ -44,7 +44,7 @@ public interface IPaymentRepository
     /// <param name="invoiceId">
     /// The ID of the invoice in the associated business.
     /// </param>
-    Task<Payment> GetLatestPaymentByInvoiceId(int businessId, String invoiceId);
+    Task<Payment?> GetLatestPaymentByInvoiceId(int businessId, String invoiceId);
 
     /// <summary>
     /// Creates a new payment for the given business and invoice.
@@ -56,4 +56,10 @@ public interface IPaymentRepository
     /// Thrown when there's already a finished payment to the given invoice.
     /// </exception>
     Task CreatePaymentForInvoiceId(int business, String invoiceId);
+
+    /// <summary>
+    /// Adds a new payment to the database.
+    /// </summary>
+    /// <param name="payment">The payment entity to add.</param>
+    Task<Payment> AddPaymentAsync(Payment payment);
 }
