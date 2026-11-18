@@ -48,6 +48,13 @@ public interface IPaymentRepository
     Task<Payment?> GetLatestPaymentByInvoiceId(int businessId, String invoiceId);
 
     /// <summary>
+    /// Gets the latest payment associated with an invoice code regardless of business ID.
+    /// </summary>
+    /// <param name="invoiceId">The invoice code.</param>
+    /// <returns>The latest payment for the given invoice code, or null if not found.</returns>
+    Task<Payment?> GetPaymentByInvoiceId(string invoiceId);
+
+    /// <summary>
     /// Creates a new payment for the given business and invoice.
     /// </summary>
     /// <exception cref="PaymentPendingException">

@@ -50,7 +50,7 @@ public class PaymentRepository : IPaymentRepository
     /// <summary>
     /// Gets the latest payment associated with an invoice code regardless of business ID.
     /// </summary>
-    public async Task<Payment?> GetLatestPaymentByInvoiceIdOnly(string invoiceId)
+    public async Task<Payment?> GetPaymentByInvoiceId(string invoiceId)
     {
         return await _context.Payments
             .Include(p => p.Business)

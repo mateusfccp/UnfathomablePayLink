@@ -41,13 +41,7 @@ public class PaymentService : IPaymentService
 
     public async Task<Payment?> GetPaymentByInvoiceIdAsync(string invoiceId)
     {
-        // Si el repositorio tiene el método específico, lo usamos
-        if (_paymentRepository is Repositories.PaymentRepository repo)
-        {
-            return await repo.GetLatestPaymentByInvoiceIdOnly(invoiceId);
-        }
-
-        return null;
+        return await _paymentRepository.GetPaymentByInvoiceId(invoiceId);
     }
 
     public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null, PaymentState? state = null)
