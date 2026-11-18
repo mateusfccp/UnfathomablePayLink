@@ -1,3 +1,4 @@
+using UnfathomablePayLink.Exceptions;
 using UnfathomablePayLink.Models;
 
 namespace UnfathomablePayLink.Interfaces;
