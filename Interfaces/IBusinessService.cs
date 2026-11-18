@@ -1,4 +1,4 @@
-namespace UnfathomablePayLink.Services;
+namespace UnfathomablePayLink.Interfaces;
 
 using UnfathomablePayLink.Models;
 

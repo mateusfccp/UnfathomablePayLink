@@ -50,11 +50,16 @@ public class PaymentService : IPaymentService
         return null;
     }
 
-    public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null)
+    public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null, PaymentState? state = null)
     {
         if (string.IsNullOrWhiteSpace(invoiceId))
         {
             throw new ArgumentException("Invoice ID cannot be empty.", nameof(invoiceId));
+        }
+
+        if (amount.HasValue && amount.Value < 0)
+        {
+            throw new ArgumentException("Payment amount cannot be negative.", nameof(amount));
         }
 
         // 1. Validar que el negocio exista en el sistema
@@ -88,14 +93,14 @@ public class PaymentService : IPaymentService
             }
         }
 
-        // 4. Crear y registrar la transacción de pago aprobada
+        // 4. Crear y registrar la transacción de pago
         var payment = new Payment
         {
             Id = 0,
             Business = business,
             InvoiceId = invoiceId,
             amount = paymentAmount,
-            state = PaymentState.Approved,
+            state = state ?? PaymentState.Approved,
             PaymentDate = DateTime.UtcNow
         };
 
