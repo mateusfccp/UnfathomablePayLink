@@ -12,16 +12,16 @@ public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IBusinessRepository _businessRepository;
-    private readonly IInvoiceRepository<Invoice, string> _invoiceRepository;
+    private readonly IInvoiceService _invoiceService;
 
     public PaymentService(
         IPaymentRepository paymentRepository,
         IBusinessRepository businessRepository,
-        IInvoiceRepository<Invoice, string> invoiceRepository)
+        IInvoiceService invoiceService)
     {
         _paymentRepository = paymentRepository;
         _businessRepository = businessRepository;
-        _invoiceRepository = invoiceRepository;
+        _invoiceService = invoiceService;
     }
 
     public async Task<Payment?> GetPaymentByIdAsync(int transactionId)
@@ -86,7 +86,7 @@ public class PaymentService : IPaymentService
         decimal paymentAmount = amount ?? 0m;
         if (paymentAmount <= 0)
         {
-            var invoice = _invoiceRepository.GetInvoiceById(invoiceId);
+            var invoice = await _invoiceService.GetInvoiceByIdAsync(businessId, invoiceId);
             if (invoice != null)
             {
                 paymentAmount = invoice.Amount;
@@ -109,13 +109,12 @@ public class PaymentService : IPaymentService
 
     public async Task<Invoice> ConsultInvoiceAsync(int businessId, string invoiceId)
     {
-        var business = await _businessRepository.GetByIdAsync(businessId);
-        if (business == null)
+        var invoice = await _invoiceService.GetInvoiceByIdAsync(businessId, invoiceId);
+        if (invoice == null)
         {
-            throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
+            throw new KeyNotFoundException($"Invoice {invoiceId} was not found for Business {businessId}.");
         }
 
-        var invoice = _invoiceRepository.GetInvoiceById(invoiceId);
-        return await Task.FromResult(invoice);
+        return invoice;
     }
 }
