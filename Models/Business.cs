@@ -5,7 +5,7 @@ namespace UnfathomablePayLink.Models;
 /// </summary>
 sealed public class Business
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Document { get; set; }
 }
