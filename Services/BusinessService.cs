@@ -9,29 +9,56 @@ using UnfathomablePayLink.Models;
 public class BusinessService : IBusinessService
 {
     private readonly IBusinessRepository _businessRepository;
+    private readonly ILogger<BusinessService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BusinessService"/> class.
     /// </summary>
     /// <param name="businessRepository">The repository used to read and persist business entities.</param>
-    public BusinessService(IBusinessRepository businessRepository)
+    /// <param name="logger">The logger used to record business configuration changes and validation failures.</param>
+    public BusinessService(
+        IBusinessRepository businessRepository,
+        ILogger<BusinessService> logger)
     {
         _businessRepository = businessRepository;
+        _logger = logger;
     }
 
     /// <inheritdoc />
     public async Task<Business?> UpdateWebhookUrlAsync(int id, string webhookUrl)
     {
-        var normalizedUrl = ValidateAndNormalizeWebhookUrl(webhookUrl);
+        string normalizedUrl;
+        try
+        {
+            normalizedUrl = ValidateAndNormalizeWebhookUrl(webhookUrl);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(
+                "Invalid webhook URL rejected for business {BusinessId}: {Reason}",
+                id,
+                ex.Message);
+            throw;
+        }
 
         var existing = await _businessRepository.GetByIdAsync(id);
         if (existing == null)
         {
+            _logger.LogWarning(
+                "Cannot update webhook URL because business {BusinessId} was not found.",
+                id);
             return null;
         }
 
         existing.WebhookUrl = normalizedUrl;
         await _businessRepository.UpdateAsync(existing);
+
+        _logger.LogInformation(
+            "Updated webhook URL for business {BusinessId} ('{BusinessName}') to {WebhookUrl}.",
+            existing.Id,
+            existing.Name,
+            normalizedUrl);
+
         return existing;
     }
 
@@ -41,11 +68,22 @@ public class BusinessService : IBusinessService
         var existing = await _businessRepository.GetByIdAsync(id);
         if (existing == null)
         {
+            _logger.LogWarning(
+                "Cannot remove webhook URL because business {BusinessId} was not found.",
+                id);
             return false;
         }
 
+        var previousUrl = existing.WebhookUrl;
         existing.WebhookUrl = null;
         await _businessRepository.UpdateAsync(existing);
+
+        _logger.LogInformation(
+            "Removed webhook URL for business {BusinessId} ('{BusinessName}', PreviousUrl={PreviousUrl}).",
+            existing.Id,
+            existing.Name,
+            previousUrl);
+
         return true;
     }
 

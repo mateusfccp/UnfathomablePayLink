@@ -15,14 +15,19 @@ using UnfathomablePayLink.Models;
 public class WebhookController : ControllerBase
 {
     private readonly IBusinessService _businessService;
+    private readonly ILogger<WebhookController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WebhookController"/> class.
     /// </summary>
     /// <param name="businessService">The service used to manage business webhook settings.</param>
-    public WebhookController(IBusinessService businessService)
+    /// <param name="logger">The logger used to record webhook configuration endpoint requests.</param>
+    public WebhookController(
+        IBusinessService businessService,
+        ILogger<WebhookController> logger)
     {
         _businessService = businessService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -36,6 +41,10 @@ public class WebhookController : ControllerBase
     public ActionResult<WebhookDto> Get()
     {
         var business = HttpContext.Features.Get<Business>()!;
+        _logger.LogDebug(
+            "Retrieved webhook configuration for business {BusinessId} (IsConfigured={IsConfigured}).",
+            business.Id,
+            !string.IsNullOrWhiteSpace(business.WebhookUrl));
         return Ok(new WebhookDto { Url = business.WebhookUrl });
     }
 
@@ -60,12 +69,15 @@ public class WebhookController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WebhookDto>> Update([FromBody] WebhookUpdateDto dto)
     {
+        var business = HttpContext.Features.Get<Business>()!;
+
         if (string.IsNullOrWhiteSpace(dto.Url))
         {
+            _logger.LogWarning(
+                "Rejected webhook update request from business {BusinessId}: empty URL.",
+                business.Id);
             return BadRequest(new { message = "Webhook URL is required." });
         }
-
-        var business = HttpContext.Features.Get<Business>()!;
 
         try
         {

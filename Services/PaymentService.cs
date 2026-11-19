@@ -53,13 +53,25 @@ public class PaymentService : IPaymentService
             payments = payments.Where(p => p.State == state.Value).ToList();
         }
 
+        _logger.LogDebug(
+            "Retrieved {Count} payment(s) for business {BusinessId} (InvoiceId={InvoiceId}, State={State}).",
+            payments.Count,
+            businessId,
+            invoiceId,
+            state);
+
         return payments;
     }
 
     /// <inheritdoc />
     public async Task<Payment?> GetPaymentByIdAsync(int transactionId)
     {
-        return await _paymentRepository.GetPaymentById(transactionId);
+        var payment = await _paymentRepository.GetPaymentById(transactionId);
+        _logger.LogDebug(
+            "Looked up payment {PaymentId} (Found={Found}).",
+            transactionId,
+            payment is not null);
+        return payment;
     }
 
     /// <inheritdoc />
@@ -67,12 +79,18 @@ public class PaymentService : IPaymentService
     {
         if (string.IsNullOrWhiteSpace(invoiceId))
         {
+            _logger.LogWarning(
+                "Payment creation rejected for business {BusinessId}: invoice ID was empty.",
+                businessId);
             throw new ArgumentException("Invoice ID cannot be empty.", nameof(invoiceId));
         }
 
         var business = await _businessRepository.GetByIdAsync(businessId);
         if (business == null)
         {
+            _logger.LogWarning(
+                "Payment creation rejected: business {BusinessId} was not found.",
+                businessId);
             throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
         }
 
@@ -80,17 +98,29 @@ public class PaymentService : IPaymentService
 
         if (existingPayments.Any(p => p.State == PaymentState.Approved))
         {
+            _logger.LogWarning(
+                "Payment creation rejected for business {BusinessId}, invoice '{InvoiceId}': an approved payment already exists.",
+                businessId,
+                invoiceId);
             throw new PaymentFinishedException(businessId, invoiceId);
         }
 
         if (existingPayments.Any(p => p.State == PaymentState.Pending))
         {
+            _logger.LogWarning(
+                "Payment creation rejected for business {BusinessId}, invoice '{InvoiceId}': a payment is already pending.",
+                businessId,
+                invoiceId);
             throw new PaymentPendingException(businessId, invoiceId);
         }
 
         var invoice = await _invoiceService.GetInvoiceByIdAsync(businessId, invoiceId);
         if (invoice == null)
         {
+            _logger.LogWarning(
+                "Payment creation rejected for business {BusinessId}: invoice '{InvoiceId}' was not found.",
+                businessId,
+                invoiceId);
             throw new KeyNotFoundException($"Invoice '{invoiceId}' for business {businessId} was not found.");
         }
 
@@ -105,6 +135,13 @@ public class PaymentService : IPaymentService
 
         var newPayment = await _paymentRepository.AddPaymentAsync(payment);
 
+        _logger.LogInformation(
+            "Created pending payment {PaymentId} for business {BusinessId}, invoice '{InvoiceId}' with amount {Amount}.",
+            newPayment.Id,
+            businessId,
+            invoiceId,
+            newPayment.Amount);
+
         _ = FakePaymentProcess(newPayment.Id);
 
         return newPayment;
@@ -115,6 +152,10 @@ public class PaymentService : IPaymentService
         try
         {
             var sleepTime = Random.Shared.NextInteger(10000) + 3000;
+            _logger.LogDebug(
+                "Starting simulated asynchronous processing for payment {PaymentId} (DelayMs={DelayMs}).",
+                paymentId,
+                sleepTime);
 
             await Task.Delay(sleepTime);
 
@@ -124,6 +165,13 @@ public class PaymentService : IPaymentService
             await using var scope = _scopeFactory.CreateAsyncScope();
             var repository = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
             var updatedPayment = await repository.UpdatePaymentStateAsync(paymentId, state);
+
+            _logger.LogInformation(
+                "Payment {PaymentId} for business {BusinessId} (invoice '{InvoiceId}') transitioned to {State}.",
+                updatedPayment.Id,
+                updatedPayment.Business.Id,
+                updatedPayment.InvoiceId,
+                updatedPayment.State);
 
             var webhookService = scope.ServiceProvider.GetRequiredService<IWebhookService>();
             await webhookService.NotifyPaymentProcessedAsync(updatedPayment);

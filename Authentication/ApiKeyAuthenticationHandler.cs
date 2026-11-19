@@ -46,23 +46,44 @@ public sealed class ApiKeyAuthenticationHandler : AuthenticationHandler<Authenti
     {
         if (!Request.Headers.TryGetValue(HeaderName, out var extractedApiKey))
         {
+            Logger.LogDebug(
+                "Request {Method} {Path} did not include the {HeaderName} header.",
+                Request.Method,
+                Request.Path,
+                HeaderName);
             return AuthenticateResult.NoResult();
         }
 
         var apiKey = extractedApiKey.ToString().Trim();
         if (string.IsNullOrEmpty(apiKey))
         {
+            Logger.LogWarning(
+                "Authentication failed for {Method} {Path}: {HeaderName} header was empty.",
+                Request.Method,
+                Request.Path,
+                HeaderName);
             return AuthenticateResult.Fail("API Key is empty.");
         }
 
         var business = await _businessRepository.GetFromApiKeyAsync(apiKey);
         if (business is null)
         {
+            Logger.LogWarning(
+                "Authentication failed for {Method} {Path}: unrecognized API key.",
+                Request.Method,
+                Request.Path);
             return AuthenticateResult.Fail("Invalid API Key.");
         }
 
         // Preserve Business in HttpContext.Features for controllers reading HttpContext.Features.Get<Business>().
         Context.Features.Set(business);
+
+        Logger.LogDebug(
+            "Authenticated business {BusinessId} ('{BusinessName}') for {Method} {Path}.",
+            business.Id,
+            business.Name,
+            Request.Method,
+            Request.Path);
 
         var claims = new[]
         {
@@ -80,6 +101,10 @@ public sealed class ApiKeyAuthenticationHandler : AuthenticationHandler<Authenti
     /// <inheritdoc />
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
+        Logger.LogWarning(
+            "Rejecting unauthenticated request {Method} {Path} with HTTP 401.",
+            Request.Method,
+            Request.Path);
         Response.StatusCode = StatusCodes.Status401Unauthorized;
         await Response.WriteAsJsonAsync(new { message = "Unauthorized." });
     }
@@ -87,6 +112,12 @@ public sealed class ApiKeyAuthenticationHandler : AuthenticationHandler<Authenti
     /// <inheritdoc />
     protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
     {
+        var business = Context.Features.Get<Business>();
+        Logger.LogWarning(
+            "Rejecting forbidden request {Method} {Path} for business {BusinessId} with HTTP 403.",
+            Request.Method,
+            Request.Path,
+            business?.Id);
         Response.StatusCode = StatusCodes.Status403Forbidden;
         await Response.WriteAsJsonAsync(new { message = "Forbidden." });
     }

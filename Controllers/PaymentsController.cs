@@ -18,18 +18,22 @@ public class PaymentsController : ControllerBase
 {
     private readonly IPaymentService _paymentService;
     private readonly Converter<Payment, PaymentDto> _paymentConverter;
+    private readonly ILogger<PaymentsController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PaymentsController"/> class.
     /// </summary>
     /// <param name="paymentService">The service used to query and process payments.</param>
     /// <param name="paymentConverter">The converter used to map <see cref="Payment"/> entities to <see cref="PaymentDto"/> instances.</param>
+    /// <param name="logger">The logger used to record payment endpoint access and authorization events.</param>
     public PaymentsController(
         IPaymentService paymentService,
-        Converter<Payment, PaymentDto> paymentConverter)
+        Converter<Payment, PaymentDto> paymentConverter,
+        ILogger<PaymentsController> logger)
     {
         _paymentService = paymentService;
         _paymentConverter = paymentConverter;
+        _logger = logger;
     }
 
     /// <summary>
@@ -67,16 +71,25 @@ public class PaymentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PaymentDto>> GetById(int id)
     {
+        var business = HttpContext.Features.Get<Business>()!;
+
         var payment = await _paymentService.GetPaymentByIdAsync(id);
         if (payment == null)
         {
+            _logger.LogDebug(
+                "Payment {PaymentId} requested by business {BusinessId} was not found.",
+                id,
+                business.Id);
             return NotFound(new { message = $"Payment with ID {id} was not found." });
         }
 
-        var business = HttpContext.Features.Get<Business>()!;
-
         if (payment.Business.Id != business.Id)
         {
+            _logger.LogWarning(
+                "Business {BusinessId} attempted unauthorized access to payment {PaymentId} owned by business {OwnerBusinessId}.",
+                business.Id,
+                id,
+                payment.Business.Id);
             return Forbid();
         }
 
@@ -101,12 +114,15 @@ public class PaymentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<PaymentDto>> Create([FromBody] PaymentCreateDto dto)
     {
+        var business = HttpContext.Features.Get<Business>()!;
+
         if (string.IsNullOrWhiteSpace(dto.InvoiceId))
         {
+            _logger.LogWarning(
+                "Rejected payment creation request from business {BusinessId}: missing invoiceId.",
+                business.Id);
             return BadRequest(new { message = "El código de factura (invoiceId) es obligatorio." });
         }
-
-        var business = HttpContext.Features.Get<Business>()!;
 
         try
         {

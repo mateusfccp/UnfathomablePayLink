@@ -33,19 +33,23 @@ public static class DatabaseInitializer
                 if (!string.IsNullOrEmpty(directory))
                 {
                     Directory.CreateDirectory(directory);
+                    logger.LogDebug("Ensured SQLite database directory '{Directory}' exists.", directory);
                 }
             }
         }
 
+        logger.LogDebug("Checking and applying pending database migrations...");
         await context.Database.MigrateAsync();
 
         if (!configuration.GetValue("Seed:Enabled", true))
         {
+            logger.LogDebug("Database test data seeding is disabled via configuration.");
             return;
         }
 
         if (await context.Businesses.AnyAsync())
         {
+            logger.LogDebug("Existing business records found; skipping test data seeding.");
             return;
         }
 

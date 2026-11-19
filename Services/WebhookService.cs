@@ -1,5 +1,6 @@
 namespace UnfathomablePayLink.Services;
 
+using System.Diagnostics;
 using System.Net.Http.Json;
 using UnfathomablePayLink.DTOs;
 using UnfathomablePayLink.Enums;
@@ -68,31 +69,44 @@ public class WebhookService : IWebhookService
         }
 
         var payload = _paymentConverter(payment);
+        var startTimestamp = Stopwatch.GetTimestamp();
+
+        _logger.LogDebug(
+            "Dispatching webhook notification for payment {PaymentId} ({State}, business {BusinessId}) to {WebhookUrl}.",
+            payment.Id,
+            payment.State,
+            payment.Business?.Id,
+            uri);
 
         try
         {
             using var content = JsonContent.Create(payload);
             await content.LoadIntoBufferAsync(cancellationToken);
             using var response = await _httpClient.PostAsync(uri, content, cancellationToken);
+            var elapsedMs = (long)Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds;
 
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation(
-                    "Webhook delivered for payment {PaymentId} ({State}) to {WebhookUrl} with status code {StatusCode}.",
+                    "Webhook delivered for payment {PaymentId} ({State}, business {BusinessId}) to {WebhookUrl} with status code {StatusCode} in {ElapsedMs}ms.",
                     payment.Id,
                     payment.State,
+                    payment.Business?.Id,
                     uri,
-                    (int)response.StatusCode);
+                    (int)response.StatusCode,
+                    elapsedMs);
                 return;
             }
 
             var responseSnippet = await ReadTruncatedResponseAsync(response, cancellationToken);
             _logger.LogWarning(
-                "Webhook delivery failed for payment {PaymentId} ({State}) to {WebhookUrl} with status code {StatusCode}. Response: {ResponseSnippet}",
+                "Webhook delivery failed for payment {PaymentId} ({State}, business {BusinessId}) to {WebhookUrl} with status code {StatusCode} in {ElapsedMs}ms. Response: {ResponseSnippet}",
                 payment.Id,
                 payment.State,
+                payment.Business?.Id,
                 uri,
                 (int)response.StatusCode,
+                elapsedMs,
                 responseSnippet);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -101,29 +115,36 @@ public class WebhookService : IWebhookService
         }
         catch (TaskCanceledException ex)
         {
+            var elapsedMs = (long)Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds;
             _logger.LogError(
                 ex,
-                "Webhook delivery timed out for payment {PaymentId} ({State}) to {WebhookUrl}.",
+                "Webhook delivery timed out after {ElapsedMs}ms for payment {PaymentId} ({State}, business {BusinessId}) to {WebhookUrl}.",
+                elapsedMs,
                 payment.Id,
                 payment.State,
+                payment.Business?.Id,
                 uri);
         }
         catch (HttpRequestException ex)
         {
+            var elapsedMs = (long)Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds;
             _logger.LogError(
                 ex,
-                "HTTP request error while delivering webhook for payment {PaymentId} ({State}) to {WebhookUrl}.",
+                "HTTP request error after {ElapsedMs}ms while delivering webhook for payment {PaymentId} ({State}, business {BusinessId}) to {WebhookUrl}.",
+                elapsedMs,
                 payment.Id,
                 payment.State,
+                payment.Business?.Id,
                 uri);
         }
         catch (Exception ex)
         {
             _logger.LogError(
                 ex,
-                "Unexpected error while delivering webhook for payment {PaymentId} ({State}) to {WebhookUrl}.",
+                "Unexpected error while delivering webhook for payment {PaymentId} ({State}, business {BusinessId}) to {WebhookUrl}.",
                 payment.Id,
                 payment.State,
+                payment.Business?.Id,
                 uri);
         }
     }
