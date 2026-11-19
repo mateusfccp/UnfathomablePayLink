@@ -1,4 +1,3 @@
-using UnfathomablePayLink.Exceptions;
 using UnfathomablePayLink.Models;
 
 namespace UnfathomablePayLink.Interfaces;
@@ -48,22 +47,15 @@ public interface IPaymentRepository
     Task<Payment?> GetLatestPaymentByInvoiceId(int businessId, String invoiceId);
 
     /// <summary>
-    /// Gets the latest payment associated with an invoice code regardless of business ID.
+    /// Retrieves all payments in the system.
     /// </summary>
-    /// <param name="invoiceId">The invoice code.</param>
-    /// <returns>The latest payment for the given invoice code, or null if not found.</returns>
-    Task<Payment?> GetPaymentByInvoiceId(string invoiceId);
+    Task<List<Payment>> GetAllPaymentsAsync();
 
     /// <summary>
-    /// Creates a new payment for the given business and invoice.
+    /// Retrieves all payments associated with a given business.
     /// </summary>
-    /// <exception cref="PaymentPendingException">
-    /// Thrown when there's already a pending payment to the given invoice.
-    /// </exception>
-    /// <exception cref="PaymentFinishedException">
-    /// Thrown when there's already a finished payment to the given invoice.
-    /// </exception>
-    Task CreatePaymentForInvoiceId(int business, String invoiceId);
+    /// <param name="businessId">The business identifier.</param>
+    Task<List<Payment>> GetPaymentsByBusinessAsync(int businessId);
 
     /// <summary>
     /// Adds a new payment to the database.

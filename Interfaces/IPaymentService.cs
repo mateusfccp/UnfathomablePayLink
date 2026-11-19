@@ -15,24 +15,17 @@ public interface IPaymentService
     Task<Payment?> GetPaymentByIdAsync(int transactionId);
 
     /// <summary>
-    /// Retrieves all payment attempts for a given business and invoice.
+    /// Retrieves all payments in the system.
     /// </summary>
-    /// <param name="businessId">The business ID.</param>
-    /// <param name="invoiceId">The invoice code.</param>
-    Task<List<Payment>> GetPaymentsByInvoiceAsync(int businessId, string invoiceId);
+    Task<List<Payment>> GetAllPaymentsAsync();
+
+    Task<List<Payment>> GetPaymentsAsync(int businessId, string? invoiceId = null, PaymentState? state = null);
 
     /// <summary>
-    /// Retrieves the most recent payment for a given business and invoice.
+    /// Retrieves all payments associated with a given business.
     /// </summary>
-    /// <param name="businessId">The business ID.</param>
-    /// <param name="invoiceId">The invoice code.</param>
-    Task<Payment?> GetLatestPaymentByInvoiceAsync(int businessId, string invoiceId);
-
-    /// <summary>
-    /// Retrieves the most recent payment associated with an invoice code across businesses.
-    /// </summary>
-    /// <param name="invoiceId">The invoice code.</param>
-    Task<Payment?> GetPaymentByInvoiceIdAsync(string invoiceId);
+    /// <param name="businessId">The business identifier.</param>
+    Task<List<Payment>> GetPaymentsByBusinessAsync(int businessId);
 
     /// <summary>
     /// Processes and records a payment for a business invoice.
