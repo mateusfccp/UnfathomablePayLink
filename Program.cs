@@ -1,14 +1,20 @@
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using UnfathomablePayLink.Context;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 using UnfathomablePayLink.Repositories;
+using UnfathomablePayLink.Routing;
 using UnfathomablePayLink.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(
+        new RouteTokenTransformerConvention(new LowercaseParameterTransformer()));
+});
 
 builder.Services.AddOpenApi(options =>
 {
@@ -60,6 +66,13 @@ builder.Services.AddScoped<IInvoiceRepository<Invoice, string>, InvoiceRepositor
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+
+// Route options
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
 
 var app = builder.Build();
 
