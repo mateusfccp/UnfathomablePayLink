@@ -24,16 +24,6 @@ public class PaymentService : IPaymentService
         _invoiceService = invoiceService;
     }
 
-    public async Task<List<Payment>> GetAllPaymentsAsync()
-    {
-        return await _paymentRepository.GetAllPaymentsAsync();
-    }
-
-    public async Task<List<Payment>> GetPaymentsByBusinessAsync(int businessId)
-    {
-        return await _paymentRepository.GetPaymentsByBusinessAsync(businessId);
-    }
-
     public async Task<List<Payment>> GetPaymentsAsync(int businessId, string? invoiceId = null, PaymentState? state = null)
     {
         var payments = await _paymentRepository.GetAllPaymentsAsync();
