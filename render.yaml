@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: unfathomable-paylink
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Swagger__Enabled
+        value: "true"
+      - key: Seed__Enabled
+        value: "true"
+      - key: Seed__TestBusinessName
+        value: Testing
+      - key: Seed__TestBusinessDocument
+        value: 00-00000000-0
+      - key: Seed__TestBusinessApiKey
+        value: testing
+      - key: ConnectionStrings__PayLinkDb
+        value: Data Source=/app/data/PayLink.db

@@ -16,6 +16,11 @@ using UnfathomablePayLink.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (Environment.GetEnvironmentVariable("PORT") is { Length: > 0 } port)
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(
@@ -24,6 +29,7 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddOpenApi(options =>
 {
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
         document.Info.Title = "PayLink API";
@@ -159,10 +165,18 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.UseHttpsRedirection();
+if (!EF.IsDesignTime)
+{
+    await DatabaseInitializer.InitializeAsync(app.Services, app.Configuration);
+}
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
     app.MapOpenApi().AllowAnonymous();
     app.UseSwaggerUI(c =>
@@ -170,7 +184,10 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/openapi/v1.json", "PayLink API v1");
         c.RoutePrefix = "swagger";
     });
+    app.MapGet("/", () => Results.Redirect("/swagger")).AllowAnonymous().ExcludeFromDescription();
 }
+
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).AllowAnonymous().ExcludeFromDescription();
 
 app.UseAuthentication();
 app.UseAuthorization();
