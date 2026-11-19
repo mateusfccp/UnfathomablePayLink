@@ -63,4 +63,10 @@ public class BusinessRepository : IBusinessRepository
     {
         return await _context.Businesses.AnyAsync(b => b.Id == id);
     }
+
+    public async Task<Business?> GetFromApiKeyAsync(string apiKey)
+    {
+        return await _context.Businesses
+            .SingleOrDefaultAsync(b => b.ApiKey == apiKey);
+    }
 }

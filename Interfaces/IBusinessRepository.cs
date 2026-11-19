@@ -48,4 +48,10 @@ public interface IBusinessRepository
     /// </summary>
     /// <param name="id">The business identifier.</param>
     Task<bool> ExistsAsync(int id);
+
+    /// <summary>
+    /// Gets the business based on its associated API key.
+    /// </summary>
+    /// <param name="apiKey">The API Key of the business.</param>
+    Task<Business?> GetFromApiKeyAsync(String apiKey);
 }

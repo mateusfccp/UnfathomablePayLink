@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using UnfathomablePayLink.Authentication;
 using UnfathomablePayLink.Context;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
@@ -34,10 +37,11 @@ builder.Services.AddOpenApi(options =>
 
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-        document.Components.SecuritySchemes.Add("ApiKeyAuth", securityScheme);
+        document.Components.SecuritySchemes["ApiKeyAuth"] = securityScheme;
+        document.RegisterComponents();
 
-        // En v2.x se referencia por OpenApiSecuritySchemeReference
-        var schemeRef = new OpenApiSecuritySchemeReference("ApiKeyAuth");
+        // En v2.x se referencia por OpenApiSecuritySchemeReference con el documento anfitrión
+        var schemeRef = new OpenApiSecuritySchemeReference("ApiKeyAuth", document);
         var requirement = new OpenApiSecurityRequirement();
         requirement.Add(schemeRef, new List<string>());
 
@@ -74,12 +78,26 @@ builder.Services.Configure<RouteOptions>(options =>
     options.LowercaseQueryStrings = true;
 });
 
+// Authentication & Authorization (API Key required by default on all endpoints)
+builder.Services
+    .AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
+    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+        ApiKeyAuthenticationHandler.SchemeName,
+        null);
+
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseHttpsRedirection();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/openapi/v1.json", "PayLink API v1");
@@ -87,10 +105,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
-
-// Endpoints
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
 

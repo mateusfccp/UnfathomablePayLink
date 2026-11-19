@@ -5,6 +5,7 @@ using UnfathomablePayLink.DTOs;
 using UnfathomablePayLink.Enums;
 using UnfathomablePayLink.Exceptions;
 using UnfathomablePayLink.Interfaces;
+using UnfathomablePayLink.Models;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,7 +19,7 @@ public class PaymentsController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/payments?businessId=1&invoiceId=INV-001&state=Approved
+    /// GET api/payments
     /// Retrieves recorded payment transactions filtered by query parameters, mapped to DTOs.
     /// </summary>
     [HttpGet]
@@ -26,7 +27,9 @@ public class PaymentsController : ControllerBase
         [FromQuery] string? invoiceId = null,
         [FromQuery] PaymentState? state = null)
     {
-        var payments = await _paymentService.GetPaymentsAsync(0, invoiceId, state); // El businessId se obtiene de la auntenicación
+        var business = HttpContext.Features.Get<Business>()!;
+
+        var payments = await _paymentService.GetPaymentsAsync(business.Id, invoiceId, state);
         return Ok(payments.Select(p => p.ToDto()));
     }
 
@@ -41,6 +44,13 @@ public class PaymentsController : ControllerBase
         if (payment == null)
         {
             return NotFound(new { message = $"Payment with ID {id} was not found." });
+        }
+
+        var business = HttpContext.Features.Get<Business>()!;
+
+        if (payment.Business.Id != business.Id)
+	{
+            return Forbid();
         }
 
         return Ok(payment.ToDto());
@@ -61,7 +71,9 @@ public class PaymentsController : ControllerBase
             return BadRequest(new { message = "El código de factura (invoiceId) es obligatorio." });
         }
 
-        return await ProcessCreate(0, dto.InvoiceId, dto); // El businessId se obtiene de la autenticación
+        var business = HttpContext.Features.Get<Business>()!;
+
+        return await ProcessCreate(business.Id, dto.InvoiceId, dto);
     }
 
     private async Task<ActionResult<PaymentDto>> ProcessCreate(int businessId, string invoiceId, PaymentCreateDto? dto)
