@@ -62,7 +62,8 @@ public static class DatabaseInitializer
             Name = name,
             Document = document,
             ApiKey = apiKey,
-            WebhookUrl = null
+            WebhookUrl = null,
+            InvoiceProviderKey = "mock"
         };
 
         var now = DateTime.UtcNow;
@@ -94,7 +95,26 @@ public static class DatabaseInitializer
             }
         };
 
+        var seedBusinesses = new List<Business>
+        {
+            new()
+            {
+                Name = "StreamHub",
+                Document = "01-00010001-1",
+                ApiKey = "key_R7bhz3nWggRC1POIDRBJWbWIX71XnhOl",
+                InvoiceProviderKey = "streamhub"
+            },
+            new()
+            {
+                Name = "Gobernanza Digital",
+                Document = "02-00020002-2",
+                ApiKey = "key_i3hqHJILK9GEK6EVw4aqQwetPJCY1BWa",
+                InvoiceProviderKey = "mock"
+            }
+        };
+
         await context.Businesses.AddAsync(testBusiness);
+        await context.Businesses.AddRangeAsync(seedBusinesses);
         await context.Payments.AddRangeAsync(samplePayments);
         await context.SaveChangesAsync();
 

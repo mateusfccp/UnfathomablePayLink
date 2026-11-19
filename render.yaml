@@ -19,5 +19,13 @@ services:
         value: 00-00000000-0
       - key: Seed__TestBusinessApiKey
         value: testing
+      - key: StreamHub__BaseUrl
+        value: https://streamhub-api-lgkh.onrender.com
+      - key: StreamHub__Email
+        value: paylink@uap.edu.ar
+      - key: StreamHub__Password
+        value: pay link
+      - key: StreamHub__DefaultFallbackAmount
+        value: "0"
       - key: ConnectionStrings__PayLinkDb
         value: Data Source=/app/data/PayLink.db

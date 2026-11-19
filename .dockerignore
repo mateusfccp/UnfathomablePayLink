@@ -1,0 +1,13 @@
+bin/
+obj/
+.git/
+.vs/
+.idea/
+.aspnet/
+.local/
+.nuget/
+*.user
+.DS_Store
+PayLink.db
+PayLink.db-shm
+PayLink.db-wal

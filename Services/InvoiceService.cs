@@ -80,7 +80,10 @@ public class InvoiceService : IInvoiceService
 
     private IInvoiceRepository ResolveRepository(Business business)
     {
-        var providerKey = "mock";
+        var providerKey = string.IsNullOrWhiteSpace(business.InvoiceProviderKey)
+            ? "mock"
+            : business.InvoiceProviderKey.Trim();
+
         if (!_repositories.TryGetValue(providerKey, out var repository))
         {
             _logger.LogError(

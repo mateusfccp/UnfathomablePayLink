@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using UnfathomablePayLink.Authentication;
 using UnfathomablePayLink.Context;
@@ -10,6 +11,7 @@ using UnfathomablePayLink.Converters;
 using UnfathomablePayLink.DTOs;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
+using UnfathomablePayLink.Options;
 using UnfathomablePayLink.Repositories;
 using UnfathomablePayLink.Routing;
 using UnfathomablePayLink.Services;
@@ -127,10 +129,20 @@ builder.Services.AddDbContext<PayLinkContext>(options =>
     );
 });
 
+// Options
+builder.Services.Configure<StreamHubOptions>(
+    builder.Configuration.GetSection(StreamHubOptions.SectionName));
+
 // Repositories
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddHttpClient<IInvoiceRepository, StreamHubInvoiceRepository>((serviceProvider, client) =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<StreamHubOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/'));
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
 
 // Services
 builder.Services.AddScoped<IBusinessService, BusinessService>();

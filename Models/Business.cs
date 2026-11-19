@@ -33,4 +33,9 @@ sealed public class Business
     /// Gets or sets the optional webhook URL notified when payments reach a terminal state.
     /// </summary>
     public string? WebhookUrl { get; set; }
+
+    /// <summary>
+    /// Gets or sets the key of the <see cref="Interfaces.IInvoiceRepository"/> provider used to query invoices for this business.
+    /// </summary>
+    public string InvoiceProviderKey { get; set; } = "mock";
 }
