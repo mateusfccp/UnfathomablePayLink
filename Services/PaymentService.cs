@@ -47,7 +47,7 @@ public class PaymentService : IPaymentService
         return await _paymentRepository.GetPaymentById(transactionId);
     }
 
-    public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null, PaymentState? state = null)
+    public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null)
     {
         if (string.IsNullOrWhiteSpace(invoiceId))
         {
@@ -97,7 +97,7 @@ public class PaymentService : IPaymentService
             Business = business,
             InvoiceId = invoiceId,
             amount = paymentAmount,
-            state = state ?? PaymentState.Approved,
+            state = PaymentState.Pending,
             PaymentDate = DateTime.UtcNow
         };
 

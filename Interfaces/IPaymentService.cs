@@ -30,8 +30,7 @@ public interface IPaymentService
     /// <param name="businessId">The business ID.</param>
     /// <param name="invoiceId">The invoice code.</param>
     /// <param name="amount">The optional amount to pay. If omitted or zero, it is queried from the external invoice.</param>
-    /// <param name="state">The payment state to assign (defaults to Approved).</param>
-    Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null, PaymentState? state = null);
+    Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null);
 
     /// <summary>
     /// Queries the external invoice details from the business.

@@ -26,13 +26,13 @@ public class PaymentsController : ControllerBase
         [FromQuery] string? invoiceId = null,
         [FromQuery] PaymentState? state = null)
     {
-        var payments = await _paymentService.GetPaymentsAsync(0, invoiceId, state);
+        var payments = await _paymentService.GetPaymentsAsync(0, invoiceId, state); // El businessId se obtiene de la auntenicación
         return Ok(payments.Select(p => p.ToDto()));
     }
 
     /// <summary>
     /// GET api/payments/{id}
-    /// Retrieves a specific payment by its primary key ID mapped to a DTO.
+    /// Retrieves a specific payment by its primary key ID mapped to a DTO.s
     /// </summary>
     [HttpGet("{id:int}")]
     public async Task<ActionResult<PaymentDto>> GetById(int id)
@@ -55,24 +55,20 @@ public class PaymentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PaymentDto>> Create([FromBody] PaymentCreateDto dto)
     {
-        if (!dto.BusinessId.HasValue)
-        {
-            return BadRequest(new { message = "El ID del negocio (businessId) es obligatorio." });
-        }
 
         if (string.IsNullOrWhiteSpace(dto.InvoiceId))
         {
             return BadRequest(new { message = "El código de factura (invoiceId) es obligatorio." });
         }
 
-        return await ProcessCreate(dto.BusinessId.Value, dto.InvoiceId, dto);
+        return await ProcessCreate(0, dto.InvoiceId, dto); // El businessId se obtiene de la autenticación
     }
 
     private async Task<ActionResult<PaymentDto>> ProcessCreate(int businessId, string invoiceId, PaymentCreateDto? dto)
     {
         try
         {
-            var payment = await _paymentService.ProcessPaymentAsync(businessId, invoiceId, dto?.Amount, dto?.State);
+            var payment = await _paymentService.ProcessPaymentAsync(businessId, invoiceId, dto?.Amount);
             var resultDto = payment.ToDto();
             return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
         }
