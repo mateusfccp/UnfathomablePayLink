@@ -12,10 +12,14 @@ using UnfathomablePayLink.Models;
 public class PaymentsController : ControllerBase
 {
     private readonly IPaymentService _paymentService;
+    private readonly Converter<Payment, PaymentDto> _paymentConverter;
 
-    public PaymentsController(IPaymentService paymentService)
+    public PaymentsController(
+        IPaymentService paymentService,
+        Converter<Payment, PaymentDto> paymentConverter)
     {
         _paymentService = paymentService;
+        _paymentConverter = paymentConverter;
     }
 
     /// <summary>
@@ -30,7 +34,7 @@ public class PaymentsController : ControllerBase
         var business = HttpContext.Features.Get<Business>()!;
 
         var payments = await _paymentService.GetPaymentsAsync(business.Id, invoiceId, state);
-        return Ok(payments.Select(p => p.ToDto()));
+        return Ok(payments.ConvertAll(_paymentConverter));
     }
 
     /// <summary>
@@ -53,7 +57,7 @@ public class PaymentsController : ControllerBase
             return Forbid();
         }
 
-        return Ok(payment.ToDto());
+        return Ok(_paymentConverter(payment));
     }
 
    
@@ -81,7 +85,7 @@ public class PaymentsController : ControllerBase
         try
         {
             var payment = await _paymentService.ProcessPaymentAsync(businessId, invoiceId, dto?.Amount);
-            var resultDto = payment.ToDto();
+            var resultDto = _paymentConverter(payment);
             return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
         }
         catch (PaymentPendingException ex)

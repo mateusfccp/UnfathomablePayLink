@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using UnfathomablePayLink.Authentication;
 using UnfathomablePayLink.Context;
+using UnfathomablePayLink.Converters;
+using UnfathomablePayLink.DTOs;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 using UnfathomablePayLink.Repositories;
@@ -70,6 +72,9 @@ builder.Services.AddScoped<IInvoiceRepository<Invoice, string>, InvoiceRepositor
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+
+// Converters
+builder.Services.AddSingleton<Converter<Payment, PaymentDto>>(_ => PaymentConverter.ToDto);
 
 // Route options
 builder.Services.Configure<RouteOptions>(options =>
