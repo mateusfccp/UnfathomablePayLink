@@ -7,7 +7,7 @@ using UnfathomablePayLink.Enums;
 /// </summary>
 sealed public class Payment
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required Business Business { get; set; }
     public required string InvoiceId { get; set; }
     public required decimal amount { get; set; }

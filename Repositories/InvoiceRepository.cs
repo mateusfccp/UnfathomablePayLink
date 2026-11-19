@@ -29,7 +29,7 @@ public class InvoiceRepository : IInvoiceRepository<Invoice, string>
             {
                 Id = "INV-002",
                 Amount = 3200.00m,
-                Description = "Suscripci√≥n Software",
+                Description = "SuscripciÛn Software",
                 DueDate = DateTime.UtcNow.AddDays(7),
                 IsPaid = false
             }
@@ -43,7 +43,7 @@ public class InvoiceRepository : IInvoiceRepository<Invoice, string>
             return invoice;
         }
 
-        // Si no est√° en el cat√°logo precargado, genera una simulaci√≥n din√°mica v√°lida
+        // Si no est· en el cat·logo precargado, genera una simulaciÛn din·mica v·lida
         return new Invoice
         {
             Id = id,

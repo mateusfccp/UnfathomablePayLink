@@ -14,6 +14,13 @@ public interface IPaymentService
     /// <param name="transactionId">The payment ID.</param>
     Task<Payment?> GetPaymentByIdAsync(int transactionId);
 
+    /// <summary>
+    /// Retrieves all recorded payment transactions.
+    /// </summary>
+    /// <param name="businessId"></param>
+    /// <param name="invoiceId"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
     Task<List<Payment>> GetPaymentsAsync(int businessId, string? invoiceId = null, PaymentState? state = null);
 
     /// <summary>
