@@ -9,21 +9,8 @@ using UnfathomablePayLink.Enums;
 public class PaymentDto
 {
     public int Id { get; set; }
-    public int BusinessId { get; set; }
-    public string BusinessName { get; set; } = string.Empty;
-    public BusinessDto? Business { get; set; }
     public string InvoiceId { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public PaymentState State { get; set; }
     public DateTime? PaymentDate { get; set; }
 }
-
-/// <summary>
-/// Alias for <see cref="PaymentDto"/> representing response data.
-/// </summary>
-public class PaymentReadDto : PaymentDto { }
-
-/// <summary>
-/// Alias for <see cref="PaymentDto"/> representing response data.
-/// </summary>
-public class PaymentResponseDto : PaymentDto { }

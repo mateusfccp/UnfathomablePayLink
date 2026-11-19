@@ -31,9 +31,6 @@ public static class MappingExtensions
         return new PaymentDto
         {
             Id = payment.Id,
-            BusinessId = payment.Business?.Id ?? 0,
-            BusinessName = payment.Business?.Name ?? string.Empty,
-            Business = payment.Business?.ToDto(),
             InvoiceId = payment.InvoiceId,
             Amount = payment.amount,
             State = payment.state,
@@ -41,15 +38,15 @@ public static class MappingExtensions
         };
     }
 
-    public static InvoiceDto ToDto(this Invoice invoice)
+    public static Payment ToEntity(this PaymentCreateDto dto, Business business)
     {
-        return new InvoiceDto
+        return new Payment
         {
-            Id = invoice.Id,
-            Amount = invoice.Amount,
-            Description = invoice.Description,
-            DueDate = invoice.DueDate,
-            IsPaid = invoice.IsPaid
+            Business = business,
+            InvoiceId = dto.InvoiceId,
+            amount = dto.Amount,
+            state = Enums.PaymentState.Pending,
+            PaymentDate = DateTime.UtcNow
         };
     }
 }

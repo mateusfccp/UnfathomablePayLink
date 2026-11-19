@@ -1,20 +1,15 @@
 namespace UnfathomablePayLink.DTOs;
 
 using System.ComponentModel.DataAnnotations;
-using UnfathomablePayLink.Enums;
 
 /// <summary>
 /// Data transfer object for creating a new payment.
 /// </summary>
 public class PaymentCreateDto
 {
+    [Required(ErrorMessage = "El ID de la factura es obligatorio.")]
+    public required string InvoiceId { get; set; }
+
     [Range(0, double.MaxValue, ErrorMessage = "El monto no puede ser negativo.")]
-    public decimal? Amount { get; set; }
-
-    public PaymentState? State { get; set; }
+    public decimal Amount { get; set; }
 }
-
-/// <summary>
-/// Alias for <see cref="PaymentCreateDto"/>.
-/// </summary>
-public class CreatePaymentDto : PaymentCreateDto { }

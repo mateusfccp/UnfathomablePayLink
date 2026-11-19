@@ -28,11 +28,6 @@ public interface IPaymentService
     /// <param name="invoiceId">The invoice code.</param>
     Task<Payment?> GetLatestPaymentByInvoiceAsync(int businessId, string invoiceId);
 
-    /// <summary>
-    /// Retrieves the most recent payment associated with an invoice code across businesses.
-    /// </summary>
-    /// <param name="invoiceId">The invoice code.</param>
-    Task<Payment?> GetPaymentByInvoiceIdAsync(string invoiceId);
 
     /// <summary>
     /// Processes and records a payment for a business invoice.

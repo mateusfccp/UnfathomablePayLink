@@ -9,13 +9,3 @@ public class BusinessDto
     public string Name { get; set; } = string.Empty;
     public string Document { get; set; } = string.Empty;
 }
-
-/// <summary>
-/// Alias for <see cref="BusinessDto"/> representing response data.
-/// </summary>
-public class BusinessReadDto : BusinessDto { }
-
-/// <summary>
-/// Alias for <see cref="BusinessDto"/> representing response data.
-/// </summary>
-public class BusinessResponseDto : BusinessDto { }

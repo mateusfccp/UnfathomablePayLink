@@ -1,10 +1,14 @@
 @baseUrl = https://localhost:7123
 
-### 1. Get All Businesses
+### =============================================================
+### 1. BUSINESSES CRUD (Gestión de Negocios Asociados)
+### =============================================================
+
+### 1.1 Read All Businesses
 GET {{baseUrl}}/api/businesses
 Accept: application/json
 
-### 2. Create a Business
+### 1.2 Create a Business
 POST {{baseUrl}}/api/businesses
 Content-Type: application/json
 
@@ -13,14 +17,112 @@ Content-Type: application/json
   "document": "12345678000199"
 }
 
-### 3. Get Payment by ID
+### 1.3 Read Business by ID
+GET {{baseUrl}}/api/businesses/1
+Accept: application/json
+
+### 1.4 Update Business
+PUT {{baseUrl}}/api/businesses/1
+Content-Type: application/json
+
+{
+  "name": "Acme Corporation Updated",
+  "document": "12345678000199"
+}
+
+### 1.5 Delete Business
+DELETE {{baseUrl}}/api/businesses/1
+
+### =============================================================
+### 2. PAYMENTS CRUD (Registro y Administración de Pagos)
+### =============================================================
+
+### 2.1 Read All Payments
+GET {{baseUrl}}/api/payments
+Accept: application/json
+
+### 2.2 Create Payment via Body (POST /payments)
+POST {{baseUrl}}/api/payments
+Content-Type: application/json
+
+{
+  "businessId": 1,
+  "invoiceId": "INV-001",
+  "amount": 1500.50,
+  "state": "Approved"
+}
+
+### 2.3 Create Payment for Business & Invoice (Route)
+POST {{baseUrl}}/api/payments/business/1/invoice/INV-002
+Content-Type: application/json
+
+### 2.4 Read Payment by Transaction ID
 GET {{baseUrl}}/api/payments/1
 Accept: application/json
 
-### 4. Create Payment for Invoice
-POST {{baseUrl}}/api/payments/business/1/invoice/INV-2026-001
+### 2.5 Consult Payment by Invoice Code
+GET {{baseUrl}}/api/payments/invoice/INV-001
+Accept: application/json
+
+### 2.6 Read Payments by Invoice
+GET {{baseUrl}}/api/payments/business/1/invoice/INV-001
+Accept: application/json
+
+### 2.7 Read Latest Payment for Invoice
+GET {{baseUrl}}/api/payments/business/1/invoice/INV-001/latest
+Accept: application/json
+
+### 2.8 Update Payment (State / Amount)
+PUT {{baseUrl}}/api/payments/1
 Content-Type: application/json
 
-### 5. Get Latest Payment for Invoice
-GET {{baseUrl}}/api/payments/business/1/invoice/INV-2026-001/latest
+{
+  "amount": 1600.00,
+  "state": "Approved"
+}
+
+### 2.9 Delete Payment
+DELETE {{baseUrl}}/api/payments/1
+
+### =============================================================
+### 3. INVOICES CRUD (Consulta de Facturas e Integración)
+### =============================================================
+
+### 3.1 Read All Invoices
+GET {{baseUrl}}/api/invoices
 Accept: application/json
+
+### 3.2 Create / Register Invoice
+POST {{baseUrl}}/api/invoices
+Content-Type: application/json
+
+{
+  "id": "INV-100",
+  "amount": 2500.00,
+  "description": "Servicio de Hosting Anual",
+  "dueDate": "2026-12-31T23:59:59Z",
+  "isPaid": false
+}
+
+### 3.3 Read Invoice by ID
+GET {{baseUrl}}/api/invoices/INV-001
+Accept: application/json
+
+### 3.4 Consult Invoice for Specific Business
+GET {{baseUrl}}/api/invoices/business/1/invoice/INV-001
+Accept: application/json
+
+### 3.5 Update Invoice
+PUT {{baseUrl}}/api/invoices/INV-100
+Content-Type: application/json
+
+{
+  "id": "INV-100",
+  "amount": 2800.00,
+  "description": "Servicio de Hosting Anual (Actualizado)",
+  "dueDate": "2026-12-31T23:59:59Z",
+  "isPaid": true
+}
+
+### 3.6 Delete Invoice
+DELETE {{baseUrl}}/api/invoices/INV-100

@@ -17,6 +17,17 @@ public class PaymentsController : ControllerBase
     }
 
     /// <summary>
+    /// GET api/payments - filters: invoice_id, payment_state
+    /// Retrieves all recorded payment transactions mapped to DTOs.
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<PaymentDto>>> GetAll()
+    {
+        var payments = await _paymentService.GetAllPaymentsAsync();
+        return Ok(payments.Select(p => p.ToDto()));
+    }
+
+    /// <summary>
     /// GET api/payments/{id}
     /// Retrieves a specific payment by its primary key ID mapped to a DTO.
     /// </summary>
@@ -32,39 +43,29 @@ public class PaymentsController : ControllerBase
         return Ok(payment.ToDto());
     }
 
+   
     /// <summary>
-    /// GET api/payments/business/{businessId}/invoice/{invoiceId}
-    /// Retrieves all payment attempts for a given business invoice mapped to DTOs.
+    /// POST api/payments
+    /// Registers a new payment transaction from a JSON body.
+    /// (Requirement: POST /payments)
     /// </summary>
-    [HttpGet("business/{businessId:int}/invoice/{invoiceId}")]
-    public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsByInvoice(int businessId, string invoiceId)
+    [HttpPost]
+    public async Task<ActionResult<PaymentDto>> Create([FromBody] PaymentCreateDto dto)
     {
-        var payments = await _paymentService.GetPaymentsByInvoiceAsync(businessId, invoiceId);
-        return Ok(payments.Select(p => p.ToDto()));
-    }
-
-    /// <summary>
-    /// GET api/payments/business/{businessId}/invoice/{invoiceId}/latest
-    /// Retrieves the most recent payment attempt for a given business invoice mapped to a DTO.
-    /// </summary>
-    [HttpGet("business/{businessId:int}/invoice/{invoiceId}/latest")]
-    public async Task<ActionResult<PaymentDto>> GetLatestPaymentByInvoice(int businessId, string invoiceId)
-    {
-        var payment = await _paymentService.GetLatestPaymentByInvoiceAsync(businessId, invoiceId);
-        if (payment == null)
+        if (!dto.BusinessId.HasValue)
         {
-            return NotFound(new { message = $"No payment records found for Business {businessId} and Invoice {invoiceId}." });
+            return BadRequest(new { message = "El ID del negocio (businessId) es obligatorio." });
         }
 
-        return Ok(payment.ToDto());
+        if (string.IsNullOrWhiteSpace(dto.InvoiceId))
+        {
+            return BadRequest(new { message = "El código de factura (invoiceId) es obligatorio." });
+        }
+
+        return await ProcessCreate(dto.BusinessId.Value, dto.InvoiceId, dto);
     }
 
-    /// <summary>
-    /// POST api/payments/business/{businessId}/invoice/{invoiceId}
-    /// Attempts to process and create a new payment for a business invoice using an optional input DTO.
-    /// </summary>
-    [HttpPost("business/{businessId:int}/invoice/{invoiceId}")]
-    public async Task<ActionResult<PaymentDto>> CreatePayment(int businessId, string invoiceId, [FromBody] PaymentCreateDto? dto = null)
+    private async Task<ActionResult<PaymentDto>> ProcessCreate(int businessId, string invoiceId, PaymentCreateDto? dto)
     {
         try
         {

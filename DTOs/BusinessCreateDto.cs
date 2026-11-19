@@ -16,8 +16,3 @@ public class BusinessCreateDto
     [StringLength(20, MinimumLength = 1, ErrorMessage = "El documento debe tener entre 1 y 20 caracteres.")]
     public string Document { get; set; } = string.Empty;
 }
-
-/// <summary>
-/// Alias for <see cref="BusinessCreateDto"/>.
-/// </summary>
-public class CreateBusinessDto : BusinessCreateDto { }
