@@ -16,6 +16,11 @@ using UnfathomablePayLink.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (Environment.GetEnvironmentVariable("PORT") is { Length: > 0 } port)
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(
@@ -24,18 +29,19 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddOpenApi(options =>
 {
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
         document.Info.Title = "PayLink API";
         document.Info.Version = "v1";
-        document.Info.Description = "API RESTful para pasarela de pagos PayLink (Programación II)";
+        document.Info.Description = "Restful API for the PayLink service.";
 
         var securityScheme = new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.ApiKey,
             Name = "X-Api-Key",
             In = ParameterLocation.Header,
-            Description = "Ingrese su API Key asignada para operar sobre la pasarela de pagos"
+            Description = "Insert your API Key to have access to the endpoints."
         };
 
         document.Components ??= new OpenApiComponents();
@@ -159,19 +165,40 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.UseHttpsRedirection();
+if (!EF.IsDesignTime)
+{
+    await DatabaseInitializer.InitializeAsync(app.Services, app.Configuration);
+}
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
     app.MapOpenApi().AllowAnonymous();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/openapi/v1.json", "PayLink API v1");
         c.RoutePrefix = "swagger";
+        c.DocumentTitle = "Unfathomable PayLink — Apocalyptic API";
+        c.HeadContent = """
+            <link rel="icon" type="image/svg+xml" href="/swagger-custom/favicon.svg">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+            """;
+        c.InjectStylesheet("/swagger-custom/apocalypse.css");
+        c.InjectJavascript("/swagger-custom/apocalypse.js");
     });
+    app.MapGet("/", () => Results.Redirect("/swagger")).AllowAnonymous().ExcludeFromDescription();
 }
 
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).AllowAnonymous().ExcludeFromDescription();
+
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

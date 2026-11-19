@@ -1,0 +1,876 @@
+:root {
+  --apoc-bg: #09080c;
+  --apoc-surface: #121018;
+  --apoc-surface-2: #1a1622;
+  --apoc-surface-3: #221c2c;
+  --apoc-border: #3d2431;
+  --apoc-border-bright: #7a1624;
+  --apoc-crimson: #d92638;
+  --apoc-crimson-deep: #7a1624;
+  --apoc-ember: #f28c28;
+  --apoc-gold: #d4a84f;
+  --apoc-bone: #ece3d5;
+  --apoc-ash: #b2a8b8;
+
+  --scrollbar-thumb: #b8323e;
+  --scrollbar-track: #121018;
+
+  color-scheme: only dark;
+  background-color: var(--apoc-bg);
+  color: var(--apoc-bone);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--apoc-bg);
+  color: var(--apoc-bone);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.swagger-ui pre,
+.swagger-ui textarea,
+dialog.apoc-lightbox {
+  --scrollbar-thumb: #b8323e;
+  --scrollbar-track: #121018;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+@supports not (scrollbar-color: auto) {
+  :root,
+  .swagger-ui pre,
+  .swagger-ui textarea,
+  dialog.apoc-lightbox {
+    scrollbar-width: auto;
+  }
+
+  :root::-webkit-scrollbar,
+  .swagger-ui pre::-webkit-scrollbar,
+  .swagger-ui textarea::-webkit-scrollbar,
+  dialog.apoc-lightbox::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  :root::-webkit-scrollbar-thumb,
+  .swagger-ui pre::-webkit-scrollbar-thumb,
+  .swagger-ui textarea::-webkit-scrollbar-thumb,
+  dialog.apoc-lightbox::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid var(--scrollbar-track);
+  }
+
+  :root::-webkit-scrollbar-track,
+  .swagger-ui pre::-webkit-scrollbar-track,
+  .swagger-ui textarea::-webkit-scrollbar-track,
+  dialog.apoc-lightbox::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+}
+
+/* ========================================================================
+   Topbar & Base Swagger Surfaces
+   ======================================================================== */
+
+.swagger-ui {
+  background-color: var(--apoc-bg);
+  color: var(--apoc-bone);
+  min-height: 100vh;
+}
+
+.swagger-ui .topbar {
+  background: linear-gradient(180deg, #140c14 0%, #0b0910 100%);
+  border-bottom: 2px solid var(--apoc-border-bright);
+  box-shadow: 0 4px 20px rgba(217, 38, 56, 0.18);
+  padding: 10px 0;
+}
+
+.swagger-ui .topbar .topbar-wrapper {
+  gap: 16px;
+}
+
+.swagger-ui .topbar a {
+  color: var(--apoc-gold);
+}
+
+.swagger-ui .topbar .download-url-wrapper .select-label {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui .topbar .download-url-wrapper input[type="text"] {
+  background: var(--apoc-surface);
+  border: 2px solid var(--apoc-border);
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .topbar .download-url-wrapper .download-url-button {
+  background: var(--apoc-crimson-deep);
+  border: 2px solid var(--apoc-crimson);
+  color: var(--apoc-bone);
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.swagger-ui .wrapper {
+  max-width: 1320px;
+}
+
+/* ========================================================================
+   Apocalyptic Hero Banner & Four Horsemen Gallery
+   ======================================================================== */
+
+.apoc-stage {
+  margin: 20px auto 8px;
+  max-width: 1320px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.apoc-team {
+  max-width: 1320px;
+  margin: 36px auto 12px;
+  padding: 24px 20px 0;
+  box-sizing: border-box;
+  border-top: 1px solid var(--apoc-border);
+}
+
+.apoc-hero {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--apoc-border-bright);
+  background-color: var(--apoc-surface);
+  box-shadow:
+    0 0 0 2px #09080c,
+    0 0 0 4px rgba(212, 168, 79, 0.25),
+    0 18px 40px rgba(0, 0, 0, 0.75);
+  min-height: 210px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.apoc-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  image-rendering: pixelated;
+  filter: brightness(0.76) contrast(1.06);
+}
+
+.apoc-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(9, 8, 12, 0.72) 0%, rgba(9, 8, 12, 0.38) 42%, rgba(9, 8, 12, 0.94) 100%),
+    radial-gradient(circle at 26% 30%, rgba(217, 38, 56, 0.2), transparent 55%);
+}
+
+.apoc-hero-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.apoc-kicker {
+  margin: 0 0 8px;
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--apoc-ember);
+  text-shadow: 0 2px 6px #000;
+}
+
+.apoc-hero-title {
+  margin: 0 0 8px;
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.15;
+  color: var(--apoc-bone);
+  text-shadow:
+    0 2px 0 #000,
+    0 0 18px rgba(217, 38, 56, 0.65);
+}
+
+.apoc-hero-subtitle {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--apoc-ash);
+  font-size: 14px;
+  line-height: 1.5;
+  text-shadow: 0 1px 4px #000;
+}
+
+.apoc-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.apoc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid var(--apoc-gold);
+  background: rgba(18, 16, 24, 0.88);
+  color: var(--apoc-gold);
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.apoc-gallery-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.apoc-gallery-title {
+  margin: 0;
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--apoc-gold);
+}
+
+.apoc-gallery-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--apoc-ash);
+}
+
+.apoc-horsemen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 1024px) {
+  .apoc-horsemen-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .apoc-horsemen-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.apoc-card {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  border: 2px solid var(--apoc-border);
+  background: var(--apoc-surface);
+  color: var(--apoc-bone);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.apoc-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--apoc-crimson);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.7),
+    0 0 16px rgba(242, 140, 40, 0.22);
+}
+
+.apoc-card:focus-visible {
+  outline: 2px solid var(--apoc-gold);
+  outline-offset: 2px;
+  border-color: var(--apoc-gold);
+}
+
+.apoc-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #060508;
+  overflow: hidden;
+  border-bottom: 2px solid var(--apoc-border);
+}
+
+.apoc-card-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  transition: transform 200ms ease;
+}
+
+.apoc-card:hover .apoc-card-img {
+  transform: scale(1.04);
+}
+
+.apoc-card-seal {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 7px;
+  background: rgba(9, 8, 12, 0.88);
+  border: 1px solid var(--apoc-gold);
+  color: var(--apoc-gold);
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.apoc-card-body {
+  padding: 11px 12px 13px;
+}
+
+.apoc-card-name {
+  margin: 0 0 4px;
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 13px;
+  color: var(--apoc-bone);
+}
+
+.apoc-card-role {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--apoc-ash);
+}
+
+/* ========================================================================
+   Horseman Lightbox Modal (<dialog>)
+   ======================================================================== */
+
+dialog.apoc-lightbox {
+  max-width: min(940px, 94vw);
+  width: 100%;
+  padding: 0;
+  margin: auto;
+  border: 2px solid var(--apoc-crimson);
+  background: var(--apoc-surface);
+  color: var(--apoc-bone);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 28px rgba(217, 38, 56, 0.35);
+}
+
+dialog.apoc-lightbox:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.apoc-lightbox::backdrop {
+  background: rgba(5, 4, 8, 0.84);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.apoc-lightbox-frame {
+  display: flex;
+  flex-direction: column;
+}
+
+.apoc-lightbox-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #050408;
+  image-rendering: pixelated;
+  border-bottom: 2px solid var(--apoc-border);
+}
+
+.apoc-lightbox-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--apoc-surface-2);
+}
+
+.apoc-lightbox-title {
+  margin: 0 0 4px;
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 16px;
+  color: var(--apoc-gold);
+}
+
+.apoc-lightbox-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--apoc-ash);
+}
+
+.apoc-lightbox-close {
+  appearance: none;
+  padding: 9px 16px;
+  background: var(--apoc-crimson-deep);
+  border: 2px solid var(--apoc-crimson);
+  color: var(--apoc-bone);
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.apoc-lightbox-close:hover {
+  background: var(--apoc-crimson);
+}
+
+.apoc-lightbox-close:focus-visible {
+  outline: 2px solid var(--apoc-gold);
+  outline-offset: 2px;
+}
+
+.apoc-footer {
+  max-width: 1320px;
+  margin: 24px auto 0;
+  padding: 16px 20px 36px;
+  border-top: 1px solid var(--apoc-border);
+  text-align: center;
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--apoc-ash);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apoc-card,
+  .apoc-card-img {
+    transition: none;
+  }
+
+  .apoc-card:hover,
+  .apoc-card:hover .apoc-card-img {
+    transform: none;
+  }
+}
+
+/* ========================================================================
+   Swagger UI Full Dark Apocalyptic Theme
+   ======================================================================== */
+
+.swagger-ui .info {
+  margin: 24px 0 20px;
+}
+
+.swagger-ui .info .title {
+  font-family: "Silkscreen", "Courier New", monospace;
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .info .title small {
+  background: var(--apoc-surface-2);
+  border: 1px solid var(--apoc-border);
+  color: var(--apoc-gold);
+}
+
+.swagger-ui .info .title small.version-stamp {
+  background: var(--apoc-crimson-deep);
+  border-color: var(--apoc-crimson);
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .info p,
+.swagger-ui .info li,
+.swagger-ui .info table,
+.swagger-ui .renderedMarkdown p,
+.swagger-ui .renderedMarkdown li {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui .info a,
+.swagger-ui .info .link,
+.swagger-ui .renderedMarkdown a {
+  color: var(--apoc-gold);
+}
+
+.swagger-ui .info a:hover,
+.swagger-ui .renderedMarkdown a:hover {
+  color: var(--apoc-ember);
+}
+
+.swagger-ui .renderedMarkdown code,
+.swagger-ui :not(pre) > code {
+  background: var(--apoc-surface-2);
+  color: var(--apoc-ember);
+  border: 1px solid var(--apoc-border);
+  padding: 2px 5px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.swagger-ui pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+.swagger-ui .scheme-container {
+  background: var(--apoc-surface);
+  border-top: 1px solid var(--apoc-border);
+  border-bottom: 1px solid var(--apoc-border);
+  box-shadow: none;
+  padding: 18px 0;
+}
+
+.swagger-ui .btn {
+  background: var(--apoc-surface-2);
+  border-color: var(--apoc-border);
+  color: var(--apoc-bone);
+  box-shadow: none;
+}
+
+.swagger-ui .btn:hover {
+  border-color: var(--apoc-gold);
+}
+
+.swagger-ui .btn.authorize {
+  background: rgba(122, 22, 36, 0.28);
+  border-color: var(--apoc-gold);
+  color: var(--apoc-gold);
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.swagger-ui .btn.authorize svg {
+  fill: var(--apoc-gold);
+}
+
+.swagger-ui .btn.execute {
+  background: var(--apoc-crimson-deep);
+  border-color: var(--apoc-crimson);
+  color: var(--apoc-bone);
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.swagger-ui .btn.execute:hover {
+  background: var(--apoc-crimson);
+}
+
+.swagger-ui .btn.cancel {
+  border-color: var(--apoc-ember);
+  color: var(--apoc-ember);
+}
+
+/* Tags / Sections */
+.swagger-ui .opblock-tag-section {
+  margin-bottom: 14px;
+}
+
+.swagger-ui .opblock-tag {
+  background: var(--apoc-surface);
+  border: 1px solid var(--apoc-border);
+  border-bottom: 2px solid var(--apoc-border-bright);
+  color: var(--apoc-gold);
+  font-family: "Silkscreen", "Courier New", monospace;
+  padding: 12px 16px;
+}
+
+.swagger-ui .opblock-tag:hover {
+  background: var(--apoc-surface-2);
+}
+
+.swagger-ui .opblock-tag small {
+  color: var(--apoc-ash);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.swagger-ui .opblock-tag svg,
+.swagger-ui .opblock-summary-control svg,
+.swagger-ui .expand-operation svg,
+.swagger-ui .authorization__btn svg,
+.swagger-ui .copy-to-clipboard svg,
+.swagger-ui .view-line-link svg {
+  fill: var(--apoc-bone);
+}
+
+.swagger-ui .opblock {
+  background: var(--apoc-surface);
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.swagger-ui .opblock .opblock-summary-method {
+  font-family: "Silkscreen", "Courier New", monospace;
+  font-size: 11px;
+}
+
+.swagger-ui .opblock .opblock-summary-path,
+.swagger-ui .opblock .opblock-summary-path__deprecated {
+  color: var(--apoc-bone);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.swagger-ui .opblock .opblock-summary-description {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui .opblock.opblock-get {
+  background: rgba(20, 32, 48, 0.72);
+  border-color: #2f5e8f;
+}
+
+.swagger-ui .opblock.opblock-get > .opblock-summary .opblock-summary-method {
+  background: #235789;
+}
+
+.swagger-ui .opblock.opblock-get > .opblock-summary {
+  border-color: #2f5e8f;
+}
+
+.swagger-ui .opblock.opblock-post {
+  background: rgba(16, 36, 28, 0.72);
+  border-color: #2c7a56;
+}
+
+.swagger-ui .opblock.opblock-post > .opblock-summary .opblock-summary-method,
+.swagger-ui .callbacks-container .opblock.opblock-post > .opblock-summary .opblock-summary-method {
+  background: #226b49;
+}
+
+.swagger-ui .opblock.opblock-post > .opblock-summary {
+  border-color: #2c7a56;
+}
+
+.swagger-ui .opblock.opblock-put {
+  background: rgba(44, 30, 14, 0.76);
+  border-color: #9e621c;
+}
+
+.swagger-ui .opblock.opblock-put > .opblock-summary .opblock-summary-method {
+  background: #9c5b14;
+}
+
+.swagger-ui .opblock.opblock-put > .opblock-summary {
+  border-color: #9e621c;
+}
+
+.swagger-ui .opblock.opblock-delete {
+  background: rgba(48, 15, 22, 0.76);
+  border-color: var(--apoc-crimson);
+}
+
+.swagger-ui .opblock.opblock-delete > .opblock-summary .opblock-summary-method {
+  background: #9e1b2a;
+}
+
+.swagger-ui .opblock.opblock-delete > .opblock-summary {
+  border-color: var(--apoc-crimson);
+}
+
+.swagger-ui .opblock .opblock-section-header {
+  background: var(--apoc-surface-2);
+  border-top: 1px solid var(--apoc-border);
+  border-bottom: 1px solid var(--apoc-border);
+  box-shadow: none;
+}
+
+.swagger-ui .opblock .opblock-section-header h4,
+.swagger-ui .opblock .opblock-section-header label,
+.swagger-ui .opblock-description-wrapper p,
+.swagger-ui .opblock-external-docs-wrapper p,
+.swagger-ui .opblock-title_normal p {
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .opblock-body,
+.swagger-ui .responses-inner,
+.swagger-ui .callbacks-container {
+  background: var(--apoc-surface);
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .callback-title {
+  color: var(--apoc-gold);
+  font-family: "Silkscreen", "Courier New", monospace;
+}
+
+.swagger-ui .tab li {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui .tab li button.tablinks {
+  color: var(--apoc-ash);
+  background: transparent;
+}
+
+.swagger-ui .tab li.active button.tablinks {
+  color: var(--apoc-gold);
+}
+
+.swagger-ui table thead tr td,
+.swagger-ui table thead tr th {
+  color: var(--apoc-gold);
+  border-bottom: 1px solid var(--apoc-border);
+}
+
+.swagger-ui table tbody tr td {
+  color: var(--apoc-bone);
+  border-bottom: 1px solid rgba(61, 36, 49, 0.55);
+}
+
+.swagger-ui .parameter__name,
+.swagger-ui .response-col_status,
+.swagger-ui .response-col_links,
+.swagger-ui .responses-header td {
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .parameter__name.required::after {
+  color: var(--apoc-crimson);
+}
+
+.swagger-ui .parameter__type,
+.swagger-ui .parameter__in {
+  color: var(--apoc-ember);
+}
+
+.swagger-ui .parameter__extension,
+.swagger-ui .parameter__deprecated {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui input[type="text"],
+.swagger-ui input[type="password"],
+.swagger-ui input[type="search"],
+.swagger-ui input[type="email"],
+.swagger-ui input[type="file"],
+.swagger-ui textarea,
+.swagger-ui select {
+  background-color: #0b0910;
+  color: var(--apoc-bone);
+  border: 1px solid var(--apoc-border);
+}
+
+.swagger-ui input:focus-visible,
+.swagger-ui textarea:focus-visible,
+.swagger-ui select:focus-visible {
+  outline: 2px solid var(--apoc-gold);
+  outline-offset: 1px;
+  border-color: var(--apoc-gold);
+}
+
+.swagger-ui .highlight-code pre.microlight,
+.swagger-ui pre.microlight,
+.swagger-ui pre.example {
+  background: #0b0910 !important;
+  color: var(--apoc-bone) !important;
+  border: 1px solid var(--apoc-border);
+  line-height: 1.55;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.swagger-ui pre.microlight span {
+  background: transparent !important;
+}
+
+.swagger-ui .response-control-media-type__accept-message {
+  color: #6ce5a3;
+}
+
+/* Models / Schemas */
+.swagger-ui section.models {
+  background: var(--apoc-surface);
+  border: 1px solid var(--apoc-border);
+}
+
+.swagger-ui section.models h4,
+.swagger-ui section.models.is-open h4 {
+  color: var(--apoc-gold);
+  border-bottom: 1px solid var(--apoc-border);
+  font-family: "Silkscreen", "Courier New", monospace;
+}
+
+.swagger-ui section.models h4 svg {
+  fill: var(--apoc-gold);
+}
+
+.swagger-ui .model-container {
+  background: var(--apoc-surface-2);
+  border: 1px solid var(--apoc-border);
+}
+
+.swagger-ui .model-box,
+.swagger-ui .model {
+  background: transparent;
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .model-title,
+.swagger-ui span.model-title__text {
+  color: var(--apoc-gold);
+}
+
+.swagger-ui .prop-type {
+  color: #6cb6ff;
+}
+
+.swagger-ui .prop-format {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui .model .property.primitive {
+  color: var(--apoc-ash);
+}
+
+.swagger-ui .model-toggle::after {
+  filter: invert(0.88) sepia(0.25) saturate(1.4);
+}
+
+/* Swagger Built-in Authorize Modal */
+.swagger-ui .dialog-ux .backdrop-ux {
+  background: rgba(5, 4, 8, 0.84);
+}
+
+.swagger-ui .dialog-ux .modal-ux {
+  background: var(--apoc-surface);
+  border: 2px solid var(--apoc-crimson);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+
+.swagger-ui .dialog-ux .modal-ux-header {
+  background: var(--apoc-surface-2);
+  border-bottom: 1px solid var(--apoc-border);
+}
+
+.swagger-ui .dialog-ux .modal-ux-header h3,
+.swagger-ui .dialog-ux .modal-ux-content h4,
+.swagger-ui .dialog-ux .modal-ux-content p,
+.swagger-ui .dialog-ux .modal-ux-content label {
+  color: var(--apoc-bone);
+}
+
+.swagger-ui .dialog-ux .modal-ux-header .close-modal svg {
+  fill: var(--apoc-bone);
+}
+
+.swagger-ui .auth-container {
+  border-bottom: 1px solid var(--apoc-border);
+}
+
+.swagger-ui .loading-container .loading::after {
+  color: var(--apoc-gold);
+}
