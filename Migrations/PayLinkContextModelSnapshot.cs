@@ -15,7 +15,7 @@ partial class PayLinkContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261119030318_AddUniqueIndexesToBusiness";
+    public override string LastMigrationId => "20261119113931_AddBusinessWebhookUrl";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -40,6 +40,9 @@ partial class PayLinkContextModelSnapshot : ModelSnapshot
                     .IsRequired()
                     .HasColumnType("TEXT");
 
+                b.Property<string>("WebhookUrl")
+                    .HasColumnType("TEXT");
+
                 b.HasKey("Id");
 
                 b.HasIndex("ApiKey")
@@ -57,6 +60,9 @@ partial class PayLinkContextModelSnapshot : ModelSnapshot
                     .ValueGeneratedOnAdd()
                     .HasColumnType("INTEGER");
 
+                b.Property<decimal>("Amount")
+                    .HasColumnType("TEXT");
+
                 b.Property<int>("BusinessId")
                     .HasColumnType("INTEGER");
 
@@ -67,10 +73,7 @@ partial class PayLinkContextModelSnapshot : ModelSnapshot
                 b.Property<DateTime?>("PaymentDate")
                     .HasColumnType("TEXT");
 
-                b.Property<decimal>("amount")
-                    .HasColumnType("TEXT");
-
-                b.Property<string>("state")
+                b.Property<string>("State")
                     .IsRequired()
                     .HasColumnType("TEXT");
 

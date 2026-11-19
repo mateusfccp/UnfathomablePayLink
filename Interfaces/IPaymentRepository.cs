@@ -65,9 +65,10 @@ public interface IPaymentRepository
     Task<Payment> AddPaymentAsync(Payment payment);
 
     /// <summary>
-    /// Updates a payment.
+    /// Updates a payment's state.
     /// </summary>
     /// <param name="paymentId">The payment ID to update.</param>
     /// <param name="state">The new state of this payment.</param>
-    Task UpdatePaymentStateAsync(int paymentId, PaymentState state);
+    /// <returns>The updated payment including its associated <see cref="Business"/>.</returns>
+    Task<Payment> UpdatePaymentStateAsync(int paymentId, PaymentState state);
 }

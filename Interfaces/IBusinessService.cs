@@ -36,4 +36,17 @@ public interface IBusinessService
     /// </summary>
     /// <param name="id">The business identifier.</param>
     Task<bool> DeleteBusinessAsync(int id);
+
+    /// <summary>
+    /// Updates the webhook URL configured for a business.
+    /// </summary>
+    /// <param name="id">The business identifier.</param>
+    /// <param name="webhookUrl">The new absolute HTTP/HTTPS webhook URL.</param>
+    Task<Business?> UpdateWebhookUrlAsync(int id, string webhookUrl);
+
+    /// <summary>
+    /// Removes the webhook URL configured for a business.
+    /// </summary>
+    /// <param name="id">The business identifier.</param>
+    Task<bool> RemoveWebhookUrlAsync(int id);
 }

@@ -44,6 +44,8 @@ public class BusinessService : IBusinessService
             throw new InvalidOperationException($"A business with document '{business.Document}' already exists.");
         }
 
+        business.WebhookUrl = ValidateAndNormalizeWebhookUrl(business.WebhookUrl);
+
         return await _businessRepository.AddAsync(business);
     }
 
@@ -66,6 +68,7 @@ public class BusinessService : IBusinessService
 
         existing.Name = business.Name;
         existing.Document = business.Document;
+        existing.WebhookUrl = ValidateAndNormalizeWebhookUrl(business.WebhookUrl);
 
         await _businessRepository.UpdateAsync(existing);
         return existing;
@@ -74,5 +77,55 @@ public class BusinessService : IBusinessService
     public async Task<bool> DeleteBusinessAsync(int id)
     {
         return await _businessRepository.DeleteAsync(id);
+    }
+
+    public async Task<Business?> UpdateWebhookUrlAsync(int id, string webhookUrl)
+    {
+        if (string.IsNullOrWhiteSpace(webhookUrl))
+        {
+            throw new ArgumentException("Webhook URL cannot be empty.", nameof(Business.WebhookUrl));
+        }
+
+        var normalizedUrl = ValidateAndNormalizeWebhookUrl(webhookUrl);
+
+        var existing = await _businessRepository.GetByIdAsync(id);
+        if (existing == null)
+        {
+            return null;
+        }
+
+        existing.WebhookUrl = normalizedUrl;
+        await _businessRepository.UpdateAsync(existing);
+        return existing;
+    }
+
+    public async Task<bool> RemoveWebhookUrlAsync(int id)
+    {
+        var existing = await _businessRepository.GetByIdAsync(id);
+        if (existing == null)
+        {
+            return false;
+        }
+
+        existing.WebhookUrl = null;
+        await _businessRepository.UpdateAsync(existing);
+        return true;
+    }
+
+    private static string? ValidateAndNormalizeWebhookUrl(string? webhookUrl)
+    {
+        if (string.IsNullOrWhiteSpace(webhookUrl))
+        {
+            return null;
+        }
+
+        var trimmed = webhookUrl.Trim();
+        if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("Webhook URL must be a valid absolute HTTP or HTTPS URL.", nameof(Business.WebhookUrl));
+        }
+
+        return trimmed;
     }
 }

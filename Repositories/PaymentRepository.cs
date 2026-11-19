@@ -64,9 +64,13 @@ public class PaymentRepository : IPaymentRepository
         return payment;
     }
 
-    public async Task UpdatePaymentStateAsync(int paymentId, PaymentState state) {
-        var payment = await _context.Payments.FirstAsync(p => p.Id == paymentId);
+    public async Task<Payment> UpdatePaymentStateAsync(int paymentId, PaymentState state)
+    {
+        var payment = await _context.Payments
+            .Include(p => p.Business)
+            .FirstAsync(p => p.Id == paymentId);
         payment.State = state;
         await _context.SaveChangesAsync();
+        return payment;
     }
 }

@@ -20,14 +20,14 @@ public class PaymentService : IPaymentService
         IPaymentRepository paymentRepository,
         IBusinessRepository businessRepository,
         IInvoiceService invoiceService,
-	ILogger<PaymentService> logger,
-	IServiceScopeFactory scopeFactory
+    ILogger<PaymentService> logger,
+    IServiceScopeFactory scopeFactory
     )
     {
         _paymentRepository = paymentRepository;
         _businessRepository = businessRepository;
         _invoiceService = invoiceService;
-	_logger = logger;
+        _logger = logger;
         _scopeFactory = scopeFactory;
     }
 
@@ -105,19 +105,21 @@ public class PaymentService : IPaymentService
 
     private async Task FakePaymentProcess(int paymentId)
     {
-	try {
-        var sleepTime = Random.Shared.NextInteger(10000) + 3000;
+        try
+        {
+            var sleepTime = Random.Shared.NextInteger(10000) + 3000;
 
-        await Task.Delay(sleepTime);
+            await Task.Delay(sleepTime);
 
-        var result = Random.Shared.NextInteger(0, 2);
-	var state = result == 0 ? PaymentState.Rejected : PaymentState.Approved;
+            var result = Random.Shared.NextInteger(0, 2);
+            var state = result == 0 ? PaymentState.Rejected : PaymentState.Approved;
 
-        await using var scope = _scopeFactory.CreateAsyncScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
-	await repository.UpdatePaymentStateAsync(paymentId, state);
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            var repository = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
+            var updatedPayment = await repository.UpdatePaymentStateAsync(paymentId, state);
 
-            // Add webhook here
+            var webhookService = scope.ServiceProvider.GetRequiredService<IWebhookService>();
+            await webhookService.NotifyPaymentProcessedAsync(updatedPayment);
         }
         catch (Exception exception)
         {

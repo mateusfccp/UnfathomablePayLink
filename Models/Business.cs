@@ -13,4 +13,5 @@ sealed public class Business
     public required string Name { get; set; }
     public required string Document { get; set; }
     public required string ApiKey { get; set; }
+    public string? WebhookUrl { get; set; }
 }

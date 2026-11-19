@@ -72,6 +72,10 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddHttpClient<IWebhookService, WebhookService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 // Converters
 builder.Services.AddSingleton<Converter<Payment, PaymentDto>>(_ => PaymentConverter.ToDto);
