@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using UnfathomablePayLink.DTOs;
+using UnfathomablePayLink.Enums;
 using UnfathomablePayLink.Exceptions;
 using UnfathomablePayLink.Interfaces;
 
@@ -17,13 +18,15 @@ public class PaymentsController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/payments - filters: invoice_id, payment_state
-    /// Retrieves all recorded payment transactions mapped to DTOs.
+    /// GET api/payments?businessId=1&invoiceId=INV-001&state=Approved
+    /// Retrieves recorded payment transactions filtered by query parameters, mapped to DTOs.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PaymentDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<PaymentDto>>> GetAll(
+        [FromQuery] string? invoiceId = null,
+        [FromQuery] PaymentState? state = null)
     {
-        var payments = await _paymentService.GetAllPaymentsAsync();
+        var payments = await _paymentService.GetPaymentsAsync(0, invoiceId, state);
         return Ok(payments.Select(p => p.ToDto()));
     }
 
