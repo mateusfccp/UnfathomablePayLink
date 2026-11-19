@@ -9,17 +9,20 @@ using UnfathomablePayLink.Models;
 public class InvoiceService : IInvoiceService
 {
     private readonly IBusinessRepository _businessRepository;
-    private readonly IInvoiceRepository<Invoice, string> _invoiceRepository;
+    private readonly Dictionary<string, IInvoiceRepository> _repositories;
 
     public InvoiceService(
         IBusinessRepository businessRepository,
-        IInvoiceRepository<Invoice, string> invoiceRepository)
+	IEnumerable<IInvoiceRepository> invoiceRepositories)
     {
         _businessRepository = businessRepository;
-        _invoiceRepository = invoiceRepository;
+        _repositories = invoiceRepositories.ToDictionary(
+	    repository => repository.ProviderKey,
+	    StringComparer.OrdinalIgnoreCase
+	);
     }
 
-    public async Task<Invoice?> GetInvoiceByIdAsync(int businessId, string invoiceId)
+    public async Task<IInvoice?> GetInvoiceByIdAsync(int businessId, string invoiceId)
     {
         if (string.IsNullOrWhiteSpace(invoiceId))
         {
@@ -32,18 +35,18 @@ public class InvoiceService : IInvoiceService
             throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
         }
 
-        var invoice = _invoiceRepository.GetInvoiceById(invoiceId);
-        return await Task.FromResult(invoice);
+        var repository = ResolveRepository(business);
+        return await repository.GetInvoiceByIdAsync(invoiceId);
     }
 
-    public async Task<bool> ValidateInvoiceAmountAsync(int businessId, string invoiceId, decimal amount)
+    private IInvoiceRepository ResolveRepository(Business business)
     {
-        var invoice = await GetInvoiceByIdAsync(businessId, invoiceId);
-        if (invoice == null)
+        var providerKey = "mock";
+        if (!_repositories.TryGetValue(providerKey, out var repository))
         {
-            return false;
+            throw new InvalidOperationException(
+                $"No invoice repository registered for provider '{providerKey}'.");
         }
-
-        return invoice.Amount == amount;
+        return repository;
     }
 }

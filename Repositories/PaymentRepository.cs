@@ -2,6 +2,7 @@ namespace UnfathomablePayLink.Repositories;
 
 using Microsoft.EntityFrameworkCore;
 using UnfathomablePayLink.Context;
+using UnfathomablePayLink.Enums;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
@@ -61,5 +62,11 @@ public class PaymentRepository : IPaymentRepository
         await _context.Payments.AddAsync(payment);
         await _context.SaveChangesAsync();
         return payment;
+    }
+
+    public async Task UpdatePaymentStateAsync(int paymentId, PaymentState state) {
+        var payment = await _context.Payments.FirstAsync(p => p.Id == paymentId);
+        payment.State = state;
+        await _context.SaveChangesAsync();
     }
 }

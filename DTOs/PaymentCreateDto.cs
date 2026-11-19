@@ -9,7 +9,4 @@ public class PaymentCreateDto
 {
     [Required(ErrorMessage = "El ID de la factura es obligatorio.")]
     public required string InvoiceId { get; set; }
-
-    [Range(0, double.MaxValue, ErrorMessage = "El monto no puede ser negativo.")]
-    public decimal Amount { get; set; }
 }

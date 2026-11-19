@@ -10,7 +10,7 @@ sealed public class Payment
     public int Id { get; set; }
     public required Business Business { get; set; }
     public required string InvoiceId { get; set; }
-    public required decimal amount { get; set; }
-    public required PaymentState state { get; set; }
+    public required decimal Amount { get; set; }
+    public required PaymentState State { get; set; }
     public DateTime? PaymentDate { get; set; }
 }

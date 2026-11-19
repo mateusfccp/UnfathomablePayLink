@@ -1,10 +1,12 @@
 namespace UnfathomablePayLink.Models;
 
+using UnfathomablePayLink.Interfaces;
+
 /// <summary>
 /// Class <c>Invoice</c> represents an invoice or bill queried from a business.
-/// Implements <c>IInvoice&lt;string&gt;</c>.
+/// Implements <c>IInvoice</c>.
 /// </summary>
-public class Invoice : IInvoice<string>
+public class Invoice : IInvoice
 {
     public required string Id { get; set; }
     public required decimal Amount { get; set; }

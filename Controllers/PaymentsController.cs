@@ -95,14 +95,9 @@ public class PaymentsController : ControllerBase
 
         var business = HttpContext.Features.Get<Business>()!;
 
-        return await ProcessCreate(business.Id, dto.InvoiceId, dto);
-    }
-
-    private async Task<ActionResult<PaymentDto>> ProcessCreate(int businessId, string invoiceId, PaymentCreateDto? dto)
-    {
         try
         {
-            var payment = await _paymentService.ProcessPaymentAsync(businessId, invoiceId, dto?.Amount);
+            var payment = await _paymentService.ProcessPaymentAsync(business.Id, dto.InvoiceId);
             var resultDto = _paymentConverter(payment);
             return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
         }

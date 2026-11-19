@@ -1,3 +1,4 @@
+using UnfathomablePayLink.Enums;
 using UnfathomablePayLink.Models;
 
 namespace UnfathomablePayLink.Interfaces;
@@ -62,4 +63,11 @@ public interface IPaymentRepository
     /// </summary>
     /// <param name="payment">The payment entity to add.</param>
     Task<Payment> AddPaymentAsync(Payment payment);
+
+    /// <summary>
+    /// Updates a payment.
+    /// </summary>
+    /// <param name="paymentId">The payment ID to update.</param>
+    /// <param name="state">The new state of this payment.</param>
+    Task UpdatePaymentStateAsync(int paymentId, PaymentState state);
 }

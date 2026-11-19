@@ -8,7 +8,7 @@ using UnfathomablePayLink.Models;
 /// Simulates communication with external business billing APIs (GET /bills/{bill_id})
 /// as required by the assignment specification.
 /// </summary>
-public class InvoiceRepository : IInvoiceRepository<Invoice, string>
+public class InvoiceRepository : IInvoiceRepository
 {
     private readonly Dictionary<string, Invoice> _invoices = new()
     {
@@ -29,21 +29,22 @@ public class InvoiceRepository : IInvoiceRepository<Invoice, string>
             {
                 Id = "INV-002",
                 Amount = 3200.00m,
-                Description = "Suscripción Software",
+                Description = "SuscripciÃ³n Software",
                 DueDate = DateTime.UtcNow.AddDays(7),
                 IsPaid = false
             }
         }
     };
 
-    public Invoice GetInvoiceById(string id)
+    public string ProviderKey => "mock";
+
+    public async Task<IInvoice?> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         if (_invoices.TryGetValue(id, out var invoice))
         {
             return invoice;
         }
 
-        // Si no está en el catálogo precargado, genera una simulación dinámica válida
         return new Invoice
         {
             Id = id,

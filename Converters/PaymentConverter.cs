@@ -14,8 +14,8 @@ public static class PaymentConverter
         {
             Id = source.Id,
             InvoiceId = source.InvoiceId,
-            Amount = source.amount,
-            State = source.state,
+            Amount = source.Amount,
+            State = source.State,
             PaymentDate = source.PaymentDate
         };
     }

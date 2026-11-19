@@ -66,7 +66,7 @@ builder.Services.AddDbContext<PayLinkContext>(options =>
 // Repositories
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IInvoiceRepository<Invoice, string>, InvoiceRepository>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
 // Services
 builder.Services.AddScoped<IBusinessService, BusinessService>();

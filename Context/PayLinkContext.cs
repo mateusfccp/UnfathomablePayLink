@@ -15,7 +15,7 @@ public class PayLinkContext(DbContextOptions<PayLinkContext> options) : DbContex
 
         modelBuilder.Entity<Payment>(entity =>
 	{
-	    entity.Property(e => e.state).HasConversion<string>();
+	    entity.Property(e => e.State).HasConversion<string>();
 	    entity.HasKey(p => p.Id);
 
 	    entity.HasOne(p => p.Business)

@@ -13,15 +13,22 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _paymentRepository;
     private readonly IBusinessRepository _businessRepository;
     private readonly IInvoiceService _invoiceService;
+    private readonly ILogger<PaymentService> _logger;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     public PaymentService(
         IPaymentRepository paymentRepository,
         IBusinessRepository businessRepository,
-        IInvoiceService invoiceService)
+        IInvoiceService invoiceService,
+	ILogger<PaymentService> logger,
+	IServiceScopeFactory scopeFactory
+    )
     {
         _paymentRepository = paymentRepository;
         _businessRepository = businessRepository;
         _invoiceService = invoiceService;
+	_logger = logger;
+        _scopeFactory = scopeFactory;
     }
 
     public async Task<List<Payment>> GetPaymentsAsync(int businessId, string? invoiceId = null, PaymentState? state = null)
@@ -35,7 +42,7 @@ public class PaymentService : IPaymentService
         }
         if (state.HasValue)
         {
-            payments = payments.Where(p => p.state == state.Value).ToList();
+            payments = payments.Where(p => p.State == state.Value).ToList();
         }
 
         return payments;
@@ -47,73 +54,74 @@ public class PaymentService : IPaymentService
         return await _paymentRepository.GetPaymentById(transactionId);
     }
 
-    public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null)
+    public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId)
     {
         if (string.IsNullOrWhiteSpace(invoiceId))
         {
             throw new ArgumentException("Invoice ID cannot be empty.", nameof(invoiceId));
         }
 
-        if (amount.HasValue && amount.Value < 0)
-        {
-            throw new ArgumentException("Payment amount cannot be negative.", nameof(amount));
-        }
-
-        // 1. Validar que el negocio exista en el sistema
         var business = await _businessRepository.GetByIdAsync(businessId);
         if (business == null)
         {
             throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
         }
 
-        // 2. Verificar pagos previos para la factura indicada
         var existingPayments = await _paymentRepository.GetPaymentsByInvoiceId(businessId, invoiceId);
 
-        if (existingPayments.Any(p => p.state == PaymentState.Approved))
+        if (existingPayments.Any(p => p.State == PaymentState.Approved))
         {
             throw new PaymentFinishedException(businessId, invoiceId);
         }
 
-        if (existingPayments.Any(p => p.state == PaymentState.Pending))
+        if (existingPayments.Any(p => p.State == PaymentState.Pending))
         {
             throw new PaymentPendingException(businessId, invoiceId);
         }
 
-        // 3. Determinar o validar el monto con la factura externa si no se especificó
-        decimal paymentAmount = amount ?? 0m;
-        if (paymentAmount <= 0)
-        {
-            var invoice = await _invoiceService.GetInvoiceByIdAsync(businessId, invoiceId);
-            if (invoice != null)
-            {
-                paymentAmount = invoice.Amount;
-            }
-        }
-
-        // 4. Crear y registrar la transacción de pago
-        var payment = new Payment
-        {
-            Id = 0,
-            Business = business,
-            InvoiceId = invoiceId,
-            amount = paymentAmount,
-            state = PaymentState.Pending,
-            PaymentDate = DateTime.UtcNow
-        };
-
-        return await _paymentRepository.AddPaymentAsync(payment);
-    }
-
-    public async Task<Invoice> ConsultInvoiceAsync(int businessId, string invoiceId)
-    {
         var invoice = await _invoiceService.GetInvoiceByIdAsync(businessId, invoiceId);
         if (invoice == null)
         {
-            throw new KeyNotFoundException($"Invoice {invoiceId} was not found for Business {businessId}.");
+            throw new KeyNotFoundException(); // Fix this
         }
 
-        return invoice;
+        var paymentAmount = invoice.Amount;
+
+        var payment = new Payment
+        {
+            Business = business,
+            InvoiceId = invoiceId,
+            Amount = paymentAmount,
+            State = PaymentState.Pending,
+            PaymentDate = DateTime.UtcNow
+        };
+
+        var newPayment = await _paymentRepository.AddPaymentAsync(payment);
+
+        _ = FakePaymentProcess(newPayment.Id);
+
+        return newPayment;
     }
 
-    
+    private async Task FakePaymentProcess(int paymentId)
+    {
+	try {
+        var sleepTime = Random.Shared.NextInteger(10000) + 3000;
+
+        await Task.Delay(sleepTime);
+
+        var result = Random.Shared.NextInteger(0, 2);
+	var state = result == 0 ? PaymentState.Rejected : PaymentState.Approved;
+
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        var repository = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
+	await repository.UpdatePaymentStateAsync(paymentId, state);
+
+            // Add webhook here
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Failed to process simulated payment {PaymentId}.", paymentId);
+        }
+    }
 }
