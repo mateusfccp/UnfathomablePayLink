@@ -24,19 +24,27 @@ public class PaymentService : IPaymentService
         _invoiceService = invoiceService;
     }
 
+    public async Task<List<Payment>> GetPaymentsAsync(int businessId, string? invoiceId = null, PaymentState? state = null)
+    {
+        var payments = await _paymentRepository.GetAllPaymentsAsync();
+        payments = payments.Where(p => p.Business.Id == businessId).ToList();
+
+        if (!string.IsNullOrWhiteSpace(invoiceId))
+        {
+            payments = payments.Where(p => p.InvoiceId == invoiceId).ToList();
+        }
+        if (state.HasValue)
+        {
+            payments = payments.Where(p => p.state == state.Value).ToList();
+        }
+
+        return payments;
+    }
+
+
     public async Task<Payment?> GetPaymentByIdAsync(int transactionId)
     {
         return await _paymentRepository.GetPaymentById(transactionId);
-    }
-
-    public async Task<List<Payment>> GetPaymentsByInvoiceAsync(int businessId, string invoiceId)
-    {
-        return await _paymentRepository.GetPaymentsByInvoiceId(businessId, invoiceId);
-    }
-
-    public async Task<Payment?> GetLatestPaymentByInvoiceAsync(int businessId, string invoiceId)
-    {
-        return await _paymentRepository.GetLatestPaymentByInvoiceId(businessId, invoiceId);
     }
 
     public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId, decimal? amount = null, PaymentState? state = null)
@@ -106,4 +114,6 @@ public class PaymentService : IPaymentService
 
         return invoice;
     }
+
+    
 }
