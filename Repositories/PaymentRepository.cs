@@ -7,17 +7,22 @@ using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
 /// <summary>
-/// Implements <c>IPaymentRepository</c> using Entity Framework Core and SQLite.
+/// Implements <see cref="IPaymentRepository"/> using Entity Framework Core and SQLite.
 /// </summary>
 public class PaymentRepository : IPaymentRepository
 {
     private readonly PayLinkContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PaymentRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context used to access payment records.</param>
     public PaymentRepository(PayLinkContext context)
     {
         _context = context;
     }
 
+    /// <inheritdoc />
     public async Task<Payment?> GetPaymentById(int id)
     {
         return await _context.Payments
@@ -25,6 +30,7 @@ public class PaymentRepository : IPaymentRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
+    /// <inheritdoc />
     public async Task<List<Payment>> GetPaymentsByInvoiceId(int businessId, string invoiceId)
     {
         return await _context.Payments
@@ -33,22 +39,7 @@ public class PaymentRepository : IPaymentRepository
             .ToListAsync();
     }
 
-    public async Task<Payment?> GetLatestPaymentByInvoiceId(int businessId, string invoiceId)
-    {
-        return await _context.Payments
-            .Include(p => p.Business)
-            .Where(p => p.Business.Id == businessId && p.InvoiceId == invoiceId)
-            .OrderByDescending(p => p.Id)
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<List<Payment>> GetAllPaymentsAsync()
-    {
-        return await _context.Payments
-            .Include(p => p.Business)
-            .ToListAsync();
-    }
-
+    /// <inheritdoc />
     public async Task<List<Payment>> GetPaymentsByBusinessAsync(int businessId)
     {
         return await _context.Payments
@@ -57,6 +48,7 @@ public class PaymentRepository : IPaymentRepository
             .ToListAsync();
     }
 
+    /// <inheritdoc />
     public async Task<Payment> AddPaymentAsync(Payment payment)
     {
         await _context.Payments.AddAsync(payment);
@@ -64,6 +56,7 @@ public class PaymentRepository : IPaymentRepository
         return payment;
     }
 
+    /// <inheritdoc />
     public async Task<Payment> UpdatePaymentStateAsync(int paymentId, PaymentState state)
     {
         var payment = await _context.Payments

@@ -5,6 +5,9 @@ using UnfathomablePayLink.DTOs;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
+/// <summary>
+/// Exposes endpoints for inspecting, configuring, and removing the authenticated <see cref="Business"/> webhook URL.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -13,6 +16,10 @@ public class WebhookController : ControllerBase
 {
     private readonly IBusinessService _businessService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookController"/> class.
+    /// </summary>
+    /// <param name="businessService">The service used to manage business webhook settings.</param>
     public WebhookController(IBusinessService businessService)
     {
         _businessService = businessService;
@@ -21,6 +28,7 @@ public class WebhookController : ControllerBase
     /// <summary>
     /// Retrieves the webhook URL configured for the authenticated business.
     /// </summary>
+    /// <returns>An <see cref="ActionResult{TValue}"/> containing the current <see cref="WebhookDto"/>.</returns>
     /// <response code="200">Returns the configured webhook URL (or null if none is set).</response>
     /// <response code="401">Missing or invalid API Key.</response>
     [HttpGet]
@@ -34,6 +42,8 @@ public class WebhookController : ControllerBase
     /// <summary>
     /// Configures or updates the webhook URL for the authenticated business.
     /// </summary>
+    /// <param name="dto">The payload containing the new webhook URL.</param>
+    /// <returns>An <see cref="ActionResult{TValue}"/> containing the updated <see cref="WebhookDto"/>.</returns>
     /// <response code="200">Webhook URL updated successfully.</response>
     /// <response code="400">Missing, empty, or invalid webhook URL.</response>
     /// <response code="401">Missing or invalid API Key.</response>
@@ -71,6 +81,7 @@ public class WebhookController : ControllerBase
     /// <summary>
     /// Removes the webhook URL configured for the authenticated business.
     /// </summary>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the removal.</returns>
     /// <response code="204">Webhook URL removed successfully (or already unset).</response>
     /// <response code="401">Missing or invalid API Key.</response>
     /// <response code="404">Authenticated business was not found.</response>

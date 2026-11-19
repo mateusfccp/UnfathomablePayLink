@@ -6,7 +6,7 @@ using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
 /// <summary>
-/// Implements <c>IPaymentService</c> containing the core business rules for payment processing.
+/// Implements <see cref="IPaymentService"/> containing the core business rules for payment processing.
 /// </summary>
 public class PaymentService : IPaymentService
 {
@@ -16,13 +16,20 @@ public class PaymentService : IPaymentService
     private readonly ILogger<PaymentService> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PaymentService"/> class.
+    /// </summary>
+    /// <param name="paymentRepository">The repository used to read and persist payment records.</param>
+    /// <param name="businessRepository">The repository used to resolve business records.</param>
+    /// <param name="invoiceService">The service used to retrieve external invoice details.</param>
+    /// <param name="logger">The logger used to record payment processing diagnostics.</param>
+    /// <param name="scopeFactory">The scope factory used to create DI scopes for asynchronous payment completion.</param>
     public PaymentService(
         IPaymentRepository paymentRepository,
         IBusinessRepository businessRepository,
         IInvoiceService invoiceService,
-    ILogger<PaymentService> logger,
-    IServiceScopeFactory scopeFactory
-    )
+        ILogger<PaymentService> logger,
+        IServiceScopeFactory scopeFactory)
     {
         _paymentRepository = paymentRepository;
         _businessRepository = businessRepository;
@@ -31,15 +38,16 @@ public class PaymentService : IPaymentService
         _scopeFactory = scopeFactory;
     }
 
+    /// <inheritdoc />
     public async Task<List<Payment>> GetPaymentsAsync(int businessId, string? invoiceId = null, PaymentState? state = null)
     {
-        var payments = await _paymentRepository.GetAllPaymentsAsync();
-        payments = payments.Where(p => p.Business.Id == businessId).ToList();
+        var payments = await _paymentRepository.GetPaymentsByBusinessAsync(businessId);
 
         if (!string.IsNullOrWhiteSpace(invoiceId))
         {
             payments = payments.Where(p => p.InvoiceId == invoiceId).ToList();
         }
+
         if (state.HasValue)
         {
             payments = payments.Where(p => p.State == state.Value).ToList();
@@ -48,12 +56,13 @@ public class PaymentService : IPaymentService
         return payments;
     }
 
-
+    /// <inheritdoc />
     public async Task<Payment?> GetPaymentByIdAsync(int transactionId)
     {
         return await _paymentRepository.GetPaymentById(transactionId);
     }
 
+    /// <inheritdoc />
     public async Task<Payment> ProcessPaymentAsync(int businessId, string invoiceId)
     {
         if (string.IsNullOrWhiteSpace(invoiceId))
@@ -82,16 +91,14 @@ public class PaymentService : IPaymentService
         var invoice = await _invoiceService.GetInvoiceByIdAsync(businessId, invoiceId);
         if (invoice == null)
         {
-            throw new KeyNotFoundException(); // Fix this
+            throw new KeyNotFoundException($"Invoice '{invoiceId}' for business {businessId} was not found.");
         }
-
-        var paymentAmount = invoice.Amount;
 
         var payment = new Payment
         {
             Business = business,
             InvoiceId = invoiceId,
-            Amount = paymentAmount,
+            Amount = invoice.Amount,
             State = PaymentState.Pending,
             PaymentDate = DateTime.UtcNow
         };

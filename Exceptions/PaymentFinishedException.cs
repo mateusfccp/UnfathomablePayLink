@@ -1,25 +1,29 @@
 namespace UnfathomablePayLink.Exceptions;
 
+using UnfathomablePayLink.Models;
+
 /// <summary>
-/// An exception thrown when a payment creation was attempted but there's
-/// already an accepted payment.
+/// Exception thrown when payment creation is attempted for an invoice that already has an approved <see cref="Payment"/>.
 /// </summary>
 public class PaymentFinishedException : Exception
 {
     /// <summary>
-    /// The business ID to which the invoice belong.
+    /// Gets the identifier of the <see cref="Business"/> to which the invoice belongs.
     /// </summary>
     public int businessId { get; }
 
     /// <summary>
-    /// The internal invoice ID in its business.
+    /// Gets the internal invoice identifier within its <see cref="Business"/>.
     /// </summary>
     public string invoiceId { get; }
 
     /// <summary>
-    /// Creates a <c>PaymentFinishedException</c>.
+    /// Initializes a new instance of the <see cref="PaymentFinishedException"/> class.
     /// </summary>
-    public PaymentFinishedException(int businessId, string invoiceId) {
+    /// <param name="businessId">The identifier of the owning business.</param>
+    /// <param name="invoiceId">The identifier of the invoice that has already been paid.</param>
+    public PaymentFinishedException(int businessId, string invoiceId)
+    {
         this.businessId = businessId;
         this.invoiceId = invoiceId;
     }

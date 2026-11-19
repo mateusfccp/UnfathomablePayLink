@@ -1,74 +1,52 @@
+namespace UnfathomablePayLink.Interfaces;
+
 using UnfathomablePayLink.Enums;
 using UnfathomablePayLink.Models;
 
-namespace UnfathomablePayLink.Interfaces;
-
 /// <summary>
-/// Interface <c>IInvoiceRepository</c> defines the interface of a payment
-/// repository.
-/// <para>
-/// The interface describes the repository that provides the creation and update
-/// operations of payments in the system.
-/// </para>
+/// Defines the data access contract for creating, querying, and updating <see cref="Payment"/> entities.
 /// </summary>
 public interface IPaymentRepository
 {
     /// <summary>
-    /// Gets the payment associated with given ID.
+    /// Retrieves a payment by its unique identifier, including its associated <see cref="Business"/>.
     /// </summary>
-    /// <param name="id">The unique ID of the payment in the system.</param>
-    /// <returns>The payment associated with the given ID, or null if not found.</returns>
+    /// <param name="id">The unique identifier of the payment.</param>
+    /// <returns>
+    /// The matching <see cref="Payment"/> if found; otherwise, <see langword="null"/>.
+    /// </returns>
     Task<Payment?> GetPaymentById(int id);
 
     /// <summary>
-    /// Gets all the payments associated with the given business and invoice.
-    /// <para>
-    /// It may return more than one payment because an invoice may have
-    /// previously rejected payments, but it should have at most one approved or
-    /// pending payment.
-    /// </para>
+    /// Retrieves all payments associated with the specified business and invoice.
     /// </summary>
-    /// <param name="businessId">
-    /// The ID of the business from which to get the payments.
-    /// </param>
-    /// <param name="invoiceId">
-    /// The ID of the invoice in the associated business.
-    /// </param>
-    Task<List<Payment>> GetPaymentsByInvoiceId(int businessId, String invoiceId);
+    /// <remarks>
+    /// An invoice may have multiple rejected attempts alongside at most one pending or approved payment.
+    /// </remarks>
+    /// <param name="businessId">The identifier of the business.</param>
+    /// <param name="invoiceId">The identifier of the invoice within the business.</param>
+    /// <returns>A list of matching <see cref="Payment"/> records.</returns>
+    Task<List<Payment>> GetPaymentsByInvoiceId(int businessId, string invoiceId);
 
     /// <summary>
-    /// Gets the last payment associated with the given business and invoice.
-    /// </summary>
-    /// <param name="businessId">
-    /// The ID of the business from which to get the payment.
-    /// </param>
-    /// <param name="invoiceId">
-    /// The ID of the invoice in the associated business.
-    /// </param>
-    Task<Payment?> GetLatestPaymentByInvoiceId(int businessId, String invoiceId);
-
-    /// <summary>
-    /// Retrieves all payments in the system.
-    /// </summary>
-    Task<List<Payment>> GetAllPaymentsAsync();
-
-    /// <summary>
-    /// Retrieves all payments associated with a given business.
+    /// Retrieves all payments belonging to a given business.
     /// </summary>
     /// <param name="businessId">The business identifier.</param>
+    /// <returns>A list of <see cref="Payment"/> records for the specified business.</returns>
     Task<List<Payment>> GetPaymentsByBusinessAsync(int businessId);
 
     /// <summary>
-    /// Adds a new payment to the database.
+    /// Persists a new payment entity to the database.
     /// </summary>
     /// <param name="payment">The payment entity to add.</param>
+    /// <returns>The persisted <see cref="Payment"/> entity with its generated identifier.</returns>
     Task<Payment> AddPaymentAsync(Payment payment);
 
     /// <summary>
-    /// Updates a payment's state.
+    /// Updates the processing state of an existing payment.
     /// </summary>
-    /// <param name="paymentId">The payment ID to update.</param>
-    /// <param name="state">The new state of this payment.</param>
-    /// <returns>The updated payment including its associated <see cref="Business"/>.</returns>
+    /// <param name="paymentId">The identifier of the payment to update.</param>
+    /// <param name="state">The new <see cref="PaymentState"/>.</param>
+    /// <returns>The updated <see cref="Payment"/> including its associated <see cref="Business"/>.</returns>
     Task<Payment> UpdatePaymentStateAsync(int paymentId, PaymentState state);
 }

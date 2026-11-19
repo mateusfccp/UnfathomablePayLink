@@ -5,5 +5,8 @@ namespace UnfathomablePayLink.DTOs;
 /// </summary>
 public class WebhookDto
 {
+    /// <summary>
+    /// Gets or sets the configured webhook URL, or <see langword="null"/> if none is set.
+    /// </summary>
     public string? Url { get; set; }
 }

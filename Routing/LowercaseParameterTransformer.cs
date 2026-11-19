@@ -5,6 +5,7 @@ namespace UnfathomablePayLink.Routing;
 /// </summary>
 public sealed class LowercaseParameterTransformer : IOutboundParameterTransformer
 {
+    /// <inheritdoc />
     public string? TransformOutbound(object? value) =>
         value?.ToString()?.ToLowerInvariant();
 }

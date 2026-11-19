@@ -1,20 +1,19 @@
 namespace UnfathomablePayLink.Interfaces;
 
+using UnfathomablePayLink.Models;
+
 /// <summary>
-/// Represents an invoice in a <c>Business</c>.
-/// <para>
-/// It requires, at a minimum, a string <see cref="Id"/> and an <see cref="Amount"/>.
-/// </para>
+/// Represents an invoice belonging to a <see cref="Business"/>.
 /// </summary>
 public interface IInvoice
 {
     /// <summary>
-    /// The unique identifier of the invoice within its <c>Business</c>.
+    /// Gets the unique identifier of the invoice within its <see cref="Business"/>.
     /// </summary>
     string Id { get; }
 
     /// <summary>
-    /// The total monetary amount of the invoice to be paid.
+    /// Gets the total monetary amount of the invoice to be paid.
     /// </summary>
     decimal Amount { get; }
 }

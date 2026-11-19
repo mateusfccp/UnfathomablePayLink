@@ -8,6 +8,11 @@ using UnfathomablePayLink.Models;
 /// </summary>
 public static class PaymentConverter
 {
+    /// <summary>
+    /// Converts a <see cref="Payment"/> domain model into a <see cref="PaymentDto"/>.
+    /// </summary>
+    /// <param name="source">The source <see cref="Payment"/> entity.</param>
+    /// <returns>The mapped <see cref="PaymentDto"/> instance.</returns>
     public static PaymentDto ToDto(Payment source)
     {
         return new PaymentDto

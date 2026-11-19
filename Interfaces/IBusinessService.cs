@@ -3,50 +3,29 @@ namespace UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
 /// <summary>
-/// Service interface defining business logic operations for businesses.
+/// Defines business logic operations for managing <see cref="Business"/> settings.
 /// </summary>
 public interface IBusinessService
 {
     /// <summary>
-    /// Retrieves all registered businesses.
+    /// Updates the webhook URL configured for the specified business.
     /// </summary>
-    Task<IEnumerable<Business>> GetAllBusinessesAsync();
-
-    /// <summary>
-    /// Retrieves a single business by its identifier.
-    /// </summary>
-    /// <param name="id">The business identifier.</param>
-    Task<Business?> GetBusinessByIdAsync(int id);
-
-    /// <summary>
-    /// Registers a new business applying business rules and validations.
-    /// </summary>
-    /// <param name="business">The business entity to register.</param>
-    Task<Business> RegisterBusinessAsync(Business business);
-
-    /// <summary>
-    /// Updates an existing business with new data.
-    /// </summary>
-    /// <param name="id">The identifier of the business to update.</param>
-    /// <param name="business">The updated business information.</param>
-    Task<Business?> UpdateBusinessAsync(int id, Business business);
-
-    /// <summary>
-    /// Deletes a business by its identifier.
-    /// </summary>
-    /// <param name="id">The business identifier.</param>
-    Task<bool> DeleteBusinessAsync(int id);
-
-    /// <summary>
-    /// Updates the webhook URL configured for a business.
-    /// </summary>
-    /// <param name="id">The business identifier.</param>
-    /// <param name="webhookUrl">The new absolute HTTP/HTTPS webhook URL.</param>
+    /// <param name="id">The unique identifier of the business.</param>
+    /// <param name="webhookUrl">The new absolute HTTP or HTTPS webhook URL.</param>
+    /// <returns>
+    /// The updated <see cref="Business"/> if found; otherwise, <see langword="null"/>.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="webhookUrl"/> is empty, whitespace, or not a valid absolute HTTP or HTTPS URL.
+    /// </exception>
     Task<Business?> UpdateWebhookUrlAsync(int id, string webhookUrl);
 
     /// <summary>
-    /// Removes the webhook URL configured for a business.
+    /// Clears the webhook URL configured for the specified business.
     /// </summary>
-    /// <param name="id">The business identifier.</param>
+    /// <param name="id">The unique identifier of the business.</param>
+    /// <returns>
+    /// <see langword="true"/> if the business was found and updated; otherwise, <see langword="false"/>.
+    /// </returns>
     Task<bool> RemoveWebhookUrlAsync(int id);
 }

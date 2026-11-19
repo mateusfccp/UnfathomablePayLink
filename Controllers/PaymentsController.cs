@@ -7,6 +7,9 @@ using UnfathomablePayLink.Exceptions;
 using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
+/// <summary>
+/// Exposes endpoints for querying and creating payment transactions for the authenticated <see cref="Business"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -16,6 +19,11 @@ public class PaymentsController : ControllerBase
     private readonly IPaymentService _paymentService;
     private readonly Converter<Payment, PaymentDto> _paymentConverter;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PaymentsController"/> class.
+    /// </summary>
+    /// <param name="paymentService">The service used to query and process payments.</param>
+    /// <param name="paymentConverter">The converter used to map <see cref="Payment"/> entities to <see cref="PaymentDto"/> instances.</param>
     public PaymentsController(
         IPaymentService paymentService,
         Converter<Payment, PaymentDto> paymentConverter)
@@ -25,8 +33,11 @@ public class PaymentsController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves recorded payment transactions filtered by query parameters, mapped to DTOs.
+    /// Retrieves recorded payment transactions for the authenticated business, optionally filtered by invoice or state.
     /// </summary>
+    /// <param name="invoiceId">Optional invoice identifier to filter payments by.</param>
+    /// <param name="state">Optional <see cref="PaymentState"/> to filter payments by.</param>
+    /// <returns>An <see cref="ActionResult{TValue}"/> containing the matching <see cref="PaymentDto"/> collection.</returns>
     /// <response code="200">Returns the list of payments belonging to the authenticated business.</response>
     /// <response code="401">Missing or invalid API Key.</response>
     [HttpGet]
@@ -42,8 +53,10 @@ public class PaymentsController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a specific payment by its primary key ID mapped to a DTO.
+    /// Retrieves a specific payment transaction by its primary key identifier.
     /// </summary>
+    /// <param name="id">The unique identifier of the payment.</param>
+    /// <returns>An <see cref="ActionResult{TValue}"/> containing the requested <see cref="PaymentDto"/>.</returns>
     /// <response code="200">Returns the requested payment.</response>
     /// <response code="401">Missing or invalid API Key.</response>
     /// <response code="403">The payment belongs to a different business.</response>
@@ -63,19 +76,20 @@ public class PaymentsController : ControllerBase
         var business = HttpContext.Features.Get<Business>()!;
 
         if (payment.Business.Id != business.Id)
-	{
+        {
             return Forbid();
         }
 
         return Ok(_paymentConverter(payment));
     }
 
-   
     /// <summary>
-    /// Registers a new payment transaction from a JSON body.
+    /// Registers a new payment transaction for the specified invoice and initiates asynchronous processing.
     /// </summary>
+    /// <param name="dto">The payment creation payload containing the target invoice identifier.</param>
+    /// <returns>An <see cref="ActionResult{TValue}"/> containing the newly created <see cref="PaymentDto"/>.</returns>
     /// <response code="201">Payment created successfully.</response>
-    /// <response code="400">Invalid request payload or negative amount.</response>
+    /// <response code="400">Invalid or missing invoice ID.</response>
     /// <response code="401">Missing or invalid API Key.</response>
     /// <response code="404">Business or invoice not found.</response>
     /// <response code="409">A pending or approved payment already exists for this invoice.</response>
@@ -87,7 +101,6 @@ public class PaymentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<PaymentDto>> Create([FromBody] PaymentCreateDto dto)
     {
-
         if (string.IsNullOrWhiteSpace(dto.InvoiceId))
         {
             return BadRequest(new { message = "El código de factura (invoiceId) es obligatorio." });

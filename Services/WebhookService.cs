@@ -17,6 +17,12 @@ public class WebhookService : IWebhookService
     private readonly Converter<Payment, PaymentDto> _paymentConverter;
     private readonly ILogger<WebhookService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookService"/> class.
+    /// </summary>
+    /// <param name="httpClient">The HTTP client used to dispatch webhook requests.</param>
+    /// <param name="paymentConverter">The converter used to map <see cref="Payment"/> entities to <see cref="PaymentDto"/> payloads.</param>
+    /// <param name="logger">The logger used to record webhook delivery outcomes.</param>
     public WebhookService(
         HttpClient httpClient,
         Converter<Payment, PaymentDto> paymentConverter,
@@ -27,6 +33,7 @@ public class WebhookService : IWebhookService
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public async Task NotifyPaymentProcessedAsync(Payment payment, CancellationToken cancellationToken = default)
     {
         if (payment.State is not (PaymentState.Approved or PaymentState.Rejected))

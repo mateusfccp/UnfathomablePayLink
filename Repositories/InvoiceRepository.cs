@@ -4,9 +4,7 @@ using UnfathomablePayLink.Interfaces;
 using UnfathomablePayLink.Models;
 
 /// <summary>
-/// Repository implementation for retrieving invoices from external businesses.
-/// Simulates communication with external business billing APIs (GET /bills/{bill_id})
-/// as required by the assignment specification.
+/// Mock implementation of <see cref="IInvoiceRepository"/> simulating invoice retrieval from an external business billing API.
 /// </summary>
 public class InvoiceRepository : IInvoiceRepository
 {
@@ -36,16 +34,18 @@ public class InvoiceRepository : IInvoiceRepository
         }
     };
 
+    /// <inheritdoc />
     public string ProviderKey => "mock";
 
-    public async Task<IInvoice?> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public Task<IInvoice?> GetInvoiceByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         if (_invoices.TryGetValue(id, out var invoice))
         {
-            return invoice;
+            return Task.FromResult<IInvoice?>(invoice);
         }
 
-        return new Invoice
+        IInvoice simulated = new Invoice
         {
             Id = id,
             Amount = 1000.00m,
@@ -53,5 +53,7 @@ public class InvoiceRepository : IInvoiceRepository
             DueDate = DateTime.UtcNow.AddDays(30),
             IsPaid = false
         };
+
+        return Task.FromResult<IInvoice?>(simulated);
     }
 }
