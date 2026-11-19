@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -51,7 +52,64 @@ builder.Services.AddOpenApi(options =>
         document.Security ??= new List<OpenApiSecurityRequirement>();
         document.Security.Add(requirement);
 
+        document.Webhooks ??= new Dictionary<string, IOpenApiPathItem>();
+        document.Webhooks["paymentProcessed"] = CreatePaymentProcessedWebhookPathItem(document);
+
+        if (document.Paths.TryGetValue("/api/webhook", out var webhookPath) &&
+            webhookPath.Operations is not null &&
+            webhookPath.Operations.TryGetValue(HttpMethod.Put, out var putWebhookOperation))
+        {
+            var callback = new OpenApiCallback();
+            callback.AddPathItem(
+                RuntimeExpression.Build("{$request.body#/url}"),
+                CreatePaymentProcessedWebhookPathItem(document));
+
+            putWebhookOperation.Callbacks ??= new Dictionary<string, IOpenApiCallback>();
+            putWebhookOperation.Callbacks["paymentProcessed"] = callback;
+        }
+
         return Task.CompletedTask;
+
+        static OpenApiPathItem CreatePaymentProcessedWebhookPathItem(OpenApiDocument document)
+        {
+            var operation = new OpenApiOperation
+            {
+                Summary = "Payment processed notification",
+                Description = "Sent via HTTP POST by PayLink to the business's configured webhook URL whenever a payment transitions to APPROVED or REJECTED. Uses Content-Type: application/json, a 10-second timeout, and a single delivery attempt (no retries).",
+                Security = new List<OpenApiSecurityRequirement>(),
+                RequestBody = new OpenApiRequestBody
+                {
+                    Required = true,
+                    Description = "The processed payment transaction payload.",
+                    Content = new Dictionary<string, IOpenApiMediaType>
+                    {
+                        ["application/json"] = new OpenApiMediaType
+                        {
+                            Schema = new OpenApiSchemaReference("PaymentDto", document),
+                            Example = new JsonObject
+                            {
+                                ["id"] = 42,
+                                ["invoiceId"] = "INV-001",
+                                ["amount"] = 1500.50m,
+                                ["state"] = "APPROVED",
+                                ["paymentDate"] = "2026-11-19T12:00:00Z"
+                            }
+                        }
+                    }
+                },
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse
+                    {
+                        Description = "Return any 2xx HTTP status code to acknowledge receipt of the webhook notification."
+                    }
+                }
+            };
+
+            var pathItem = new OpenApiPathItem();
+            pathItem.AddOperation(HttpMethod.Post, operation);
+            return pathItem;
+        }
     });
 });
 

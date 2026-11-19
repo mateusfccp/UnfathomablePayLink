@@ -42,6 +42,11 @@ public class WebhookController : ControllerBase
     /// <summary>
     /// Configures or updates the webhook URL for the authenticated business.
     /// </summary>
+    /// <remarks>
+    /// Whenever a payment reaches a terminal state (<c>APPROVED</c> or <c>REJECTED</c>), PayLink sends an HTTP <c>POST</c>
+    /// request with <c>Content-Type: application/json</c> containing a <see cref="PaymentDto"/> payload to the configured
+    /// URL.
+    /// </remarks>
     /// <param name="dto">The payload containing the new webhook URL.</param>
     /// <returns>An <see cref="ActionResult{TValue}"/> containing the updated <see cref="WebhookDto"/>.</returns>
     /// <response code="200">Webhook URL updated successfully.</response>
