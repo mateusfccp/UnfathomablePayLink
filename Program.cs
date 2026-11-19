@@ -132,6 +132,8 @@ builder.Services.AddDbContext<PayLinkContext>(options =>
 // Options
 builder.Services.Configure<StreamHubOptions>(
     builder.Configuration.GetSection(StreamHubOptions.SectionName));
+builder.Services.Configure<GobernanzaDigitalOptions>(
+    builder.Configuration.GetSection(GobernanzaDigitalOptions.SectionName));
 
 // Repositories
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -140,6 +142,12 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddHttpClient<IInvoiceRepository, StreamHubInvoiceRepository>((serviceProvider, client) =>
 {
     var options = serviceProvider.GetRequiredService<IOptions<StreamHubOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/'));
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+builder.Services.AddHttpClient<IInvoiceRepository, GobernanzaDigitalInvoiceRepository>((serviceProvider, client) =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<GobernanzaDigitalOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/'));
     client.Timeout = TimeSpan.FromSeconds(15);
 });

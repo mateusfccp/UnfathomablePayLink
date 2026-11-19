@@ -27,5 +27,7 @@ services:
         value: pay link
       - key: StreamHub__DefaultFallbackAmount
         value: "0"
+      - key: GobernanzaDigital__BaseUrl
+        value: https://localhost:7233
       - key: ConnectionStrings__PayLinkDb
         value: Data Source=/app/data/PayLink.db

@@ -109,7 +109,7 @@ public static class DatabaseInitializer
                 Name = "Gobernanza Digital",
                 Document = "02-00020002-2",
                 ApiKey = "key_i3hqHJILK9GEK6EVw4aqQwetPJCY1BWa",
-                InvoiceProviderKey = "mock"
+                InvoiceProviderKey = "gobernanza-digital"
             }
         };
 
