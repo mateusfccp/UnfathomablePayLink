@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
@@ -171,6 +172,16 @@ builder.Services.AddHttpClient<IWebhookService, WebhookService>(client =>
 builder.Services.AddSingleton<Converter<Business, BusinessDto>>(_ => BusinessConverter.ToDto);
 builder.Services.AddSingleton<Converter<Payment, PaymentDto>>(_ => PaymentConverter.ToDto);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedHost;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 // Route options
 builder.Services.Configure<RouteOptions>(options =>
 {
@@ -195,6 +206,8 @@ builder.Services.AddAuthorizationBuilder()
         .Build());
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (!EF.IsDesignTime)
 {
@@ -228,17 +241,16 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger
                 if (request && typeof request.url === "string" && request.url.indexOf("/openapi/") !== -1) {
                     try {
                         let apiKey = null;
-                        const uiAuth = window.ui && window.ui.authSelectors && window.ui.authSelectors.authorized
-                            ? window.ui.authSelectors.authorized()
-                            : null;
-                        if (uiAuth && typeof uiAuth.getIn === "function") {
-                            apiKey = uiAuth.getIn(["ApiKeyAuth", "value"]);
-                        }
-                        if (!apiKey) {
+                        if (window.ui && window.ui.authSelectors && typeof window.ui.authSelectors.authorized === "function") {
+                            const uiAuth = window.ui.authSelectors.authorized();
+                            if (uiAuth && typeof uiAuth.getIn === "function") {
+                                apiKey = uiAuth.getIn(["ApiKeyAuth", "value"]) || null;
+                            }
+                        } else {
                             const raw = window.localStorage.getItem("authorized");
                             if (raw) {
                                 const parsed = JSON.parse(raw);
-                                apiKey = parsed && parsed.ApiKeyAuth ? parsed.ApiKeyAuth.value : null;
+                                apiKey = parsed && parsed.ApiKeyAuth ? parsed.ApiKeyAuth.value || null : null;
                             }
                         }
                         if (apiKey) {

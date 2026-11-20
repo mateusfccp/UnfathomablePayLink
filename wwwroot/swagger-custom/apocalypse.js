@@ -251,14 +251,16 @@
 
   function readAuthorizedApiKey() {
     try {
-      const uiAuth =
+      if (
         window.ui &&
         window.ui.authSelectors &&
         typeof window.ui.authSelectors.authorized === "function"
-          ? window.ui.authSelectors.authorized()
-          : null;
-      if (uiAuth && typeof uiAuth.getIn === "function") {
-        return uiAuth.getIn(["ApiKeyAuth", "value"]) || null;
+      ) {
+        const uiAuth = window.ui.authSelectors.authorized();
+        if (uiAuth && typeof uiAuth.getIn === "function") {
+          return uiAuth.getIn(["ApiKeyAuth", "value"]) || null;
+        }
+        return null;
       }
 
       const raw = window.localStorage.getItem("authorized");
@@ -280,27 +282,39 @@
     window.__apocAuthRefreshHooked = true;
 
     let lastApiKey = readAuthorizedApiKey();
+    let refreshTimer = null;
 
-    function refreshIfAuthChanged() {
-      const nextApiKey = readAuthorizedApiKey();
-      if (nextApiKey === lastApiKey) {
-        return;
+    function scheduleRefreshIfAuthChanged() {
+      if (refreshTimer) {
+        clearTimeout(refreshTimer);
       }
-      lastApiKey = nextApiKey;
-      if (
-        window.ui &&
-        window.ui.specActions &&
-        typeof window.ui.specActions.download === "function"
-      ) {
-        window.ui.specActions.download("/openapi/v1.json");
-      }
+      refreshTimer = setTimeout(function () {
+        refreshTimer = null;
+        const nextApiKey = readAuthorizedApiKey();
+        if (nextApiKey === lastApiKey) {
+          return;
+        }
+        lastApiKey = nextApiKey;
+        if (
+          window.ui &&
+          window.ui.specActions &&
+          typeof window.ui.specActions.download === "function"
+        ) {
+          const specUrl =
+            window.ui.specSelectors &&
+            typeof window.ui.specSelectors.url === "function"
+              ? window.ui.specSelectors.url() || "/openapi/v1.json"
+              : "/openapi/v1.json";
+          window.ui.specActions.download(specUrl);
+        }
+      }, 20);
     }
 
     const origSetItem = Storage.prototype.setItem;
-    Storage.prototype.setItem = function (key, value) {
+    Storage.prototype.setItem = function (key) {
       origSetItem.apply(this, arguments);
       if (this === window.localStorage && key === "authorized") {
-        setTimeout(refreshIfAuthChanged, 0);
+        scheduleRefreshIfAuthChanged();
       }
     };
 
@@ -308,7 +322,7 @@
     Storage.prototype.removeItem = function (key) {
       origRemoveItem.apply(this, arguments);
       if (this === window.localStorage && key === "authorized") {
-        setTimeout(refreshIfAuthChanged, 0);
+        scheduleRefreshIfAuthChanged();
       }
     };
 
@@ -319,16 +333,19 @@
         !window.__apocStoreSubscribed
       ) {
         window.__apocStoreSubscribed = true;
-        window.ui.getStore().subscribe(refreshIfAuthChanged);
+        lastApiKey = readAuthorizedApiKey();
+        window.ui.getStore().subscribe(scheduleRefreshIfAuthChanged);
         return true;
       }
       return false;
     }
 
     if (!attachStoreSubscription()) {
-      window.addEventListener("load", function () {
-        setTimeout(attachStoreSubscription, 0);
-      });
+      const waitForUiTimer = setInterval(function () {
+        if (attachStoreSubscription()) {
+          clearInterval(waitForUiTimer);
+        }
+      }, 50);
     }
   }
 
