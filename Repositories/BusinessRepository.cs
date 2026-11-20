@@ -22,9 +22,34 @@ public class BusinessRepository : IBusinessRepository
     }
 
     /// <inheritdoc />
+    public async Task<List<Business>> GetAllAsync()
+    {
+        return await _context.Businesses
+            .AsNoTracking()
+            .OrderBy(b => b.Id)
+            .ToListAsync();
+    }
+
+    /// <inheritdoc />
     public async Task<Business?> GetByIdAsync(int id)
     {
         return await _context.Businesses.FindAsync(id);
+    }
+
+    /// <inheritdoc />
+    public async Task<Business?> GetByDocumentAsync(string document)
+    {
+        return await _context.Businesses
+            .AsNoTracking()
+            .SingleOrDefaultAsync(b => b.Document == document);
+    }
+
+    /// <inheritdoc />
+    public async Task<Business> AddAsync(Business business)
+    {
+        await _context.Businesses.AddAsync(business);
+        await _context.SaveChangesAsync();
+        return business;
     }
 
     /// <inheritdoc />
@@ -35,9 +60,32 @@ public class BusinessRepository : IBusinessRepository
     }
 
     /// <inheritdoc />
+    public async Task<bool> HasPaymentsAsync(int id)
+    {
+        return await _context.Payments
+            .AsNoTracking()
+            .AnyAsync(p => p.Business.Id == id);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var business = await _context.Businesses.FindAsync(id);
+        if (business is null)
+        {
+            return false;
+        }
+
+        _context.Businesses.Remove(business);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    /// <inheritdoc />
     public async Task<Business?> GetFromApiKeyAsync(string apiKey)
     {
         return await _context.Businesses
+            .AsNoTracking()
             .SingleOrDefaultAsync(b => b.ApiKey == apiKey);
     }
 }

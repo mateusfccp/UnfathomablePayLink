@@ -249,7 +249,91 @@
     return true;
   }
 
+  function readAuthorizedApiKey() {
+    try {
+      const uiAuth =
+        window.ui &&
+        window.ui.authSelectors &&
+        typeof window.ui.authSelectors.authorized === "function"
+          ? window.ui.authSelectors.authorized()
+          : null;
+      if (uiAuth && typeof uiAuth.getIn === "function") {
+        return uiAuth.getIn(["ApiKeyAuth", "value"]) || null;
+      }
+
+      const raw = window.localStorage.getItem("authorized");
+      if (!raw) {
+        return null;
+      }
+
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.ApiKeyAuth ? parsed.ApiKeyAuth.value || null : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function hookAuthSpecRefresh() {
+    if (window.__apocAuthRefreshHooked) {
+      return;
+    }
+    window.__apocAuthRefreshHooked = true;
+
+    let lastApiKey = readAuthorizedApiKey();
+
+    function refreshIfAuthChanged() {
+      const nextApiKey = readAuthorizedApiKey();
+      if (nextApiKey === lastApiKey) {
+        return;
+      }
+      lastApiKey = nextApiKey;
+      if (
+        window.ui &&
+        window.ui.specActions &&
+        typeof window.ui.specActions.download === "function"
+      ) {
+        window.ui.specActions.download("/openapi/v1.json");
+      }
+    }
+
+    const origSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      origSetItem.apply(this, arguments);
+      if (this === window.localStorage && key === "authorized") {
+        setTimeout(refreshIfAuthChanged, 0);
+      }
+    };
+
+    const origRemoveItem = Storage.prototype.removeItem;
+    Storage.prototype.removeItem = function (key) {
+      origRemoveItem.apply(this, arguments);
+      if (this === window.localStorage && key === "authorized") {
+        setTimeout(refreshIfAuthChanged, 0);
+      }
+    };
+
+    function attachStoreSubscription() {
+      if (
+        window.ui &&
+        typeof window.ui.getStore === "function" &&
+        !window.__apocStoreSubscribed
+      ) {
+        window.__apocStoreSubscribed = true;
+        window.ui.getStore().subscribe(refreshIfAuthChanged);
+        return true;
+      }
+      return false;
+    }
+
+    if (!attachStoreSubscription()) {
+      window.addEventListener("load", function () {
+        setTimeout(attachStoreSubscription, 0);
+      });
+    }
+  }
+
   function bootstrap() {
+    hookAuthSpecRefresh();
     if (injectApocalypseTheme()) {
       return;
     }

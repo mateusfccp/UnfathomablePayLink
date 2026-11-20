@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
@@ -41,9 +42,9 @@ builder.Services.AddOpenApi(options =>
         var securityScheme = new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.ApiKey,
-            Name = "X-Api-Key",
+            Name = ApiKeyAuthenticationHandler.HeaderName,
             In = ParameterLocation.Header,
-            Description = "Insert your API Key to have access to the endpoints."
+            Description = "Insert your Business or Admin API Key to access endpoints."
         };
 
         document.Components ??= new OpenApiComponents();
@@ -130,10 +131,15 @@ builder.Services.AddDbContext<PayLinkContext>(options =>
 });
 
 // Options
+builder.Services.Configure<AdminOptions>(
+    builder.Configuration.GetSection(AdminOptions.SectionName));
 builder.Services.Configure<StreamHubOptions>(
     builder.Configuration.GetSection(StreamHubOptions.SectionName));
 builder.Services.Configure<GobernanzaDigitalOptions>(
     builder.Configuration.GetSection(GobernanzaDigitalOptions.SectionName));
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IPostConfigureOptions<OpenApiOptions>, AdminOpenApiOptionsSetup>();
 
 // Repositories
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -162,6 +168,7 @@ builder.Services.AddHttpClient<IWebhookService, WebhookService>(client =>
 });
 
 // Converters
+builder.Services.AddSingleton<Converter<Business, BusinessDto>>(_ => BusinessConverter.ToDto);
 builder.Services.AddSingleton<Converter<Payment, PaymentDto>>(_ => PaymentConverter.ToDto);
 
 // Route options
@@ -179,6 +186,10 @@ builder.Services
         null);
 
 builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(AuthorizationPolicies.AdminOnly, policy =>
+        policy.RequireRole(AuthorizationPolicies.AdminRole))
+    .AddPolicy(AuthorizationPolicies.BusinessOnly, policy =>
+        policy.RequireRole(AuthorizationPolicies.BusinessRole))
     .SetFallbackPolicy(new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build());
@@ -198,12 +209,47 @@ if (app.Environment.IsDevelopment())
 
 if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
-    app.MapOpenApi().AllowAnonymous();
+    app.MapOpenApi()
+        .AllowAnonymous()
+        .AddEndpointFilter(async (context, next) =>
+        {
+            context.HttpContext.Response.Headers.CacheControl = "no-store";
+            context.HttpContext.Response.Headers.Vary = ApiKeyAuthenticationHandler.HeaderName;
+            return await next(context);
+        });
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/openapi/v1.json", "PayLink API v1");
         c.RoutePrefix = "swagger";
         c.DocumentTitle = "Unfathomable PayLink — Apocalyptic API";
+        c.EnablePersistAuthorization();
+        c.UseRequestInterceptor("""
+            (request) => {
+                if (request && typeof request.url === "string" && request.url.indexOf("/openapi/") !== -1) {
+                    try {
+                        let apiKey = null;
+                        const uiAuth = window.ui && window.ui.authSelectors && window.ui.authSelectors.authorized
+                            ? window.ui.authSelectors.authorized()
+                            : null;
+                        if (uiAuth && typeof uiAuth.getIn === "function") {
+                            apiKey = uiAuth.getIn(["ApiKeyAuth", "value"]);
+                        }
+                        if (!apiKey) {
+                            const raw = window.localStorage.getItem("authorized");
+                            if (raw) {
+                                const parsed = JSON.parse(raw);
+                                apiKey = parsed && parsed.ApiKeyAuth ? parsed.ApiKeyAuth.value : null;
+                            }
+                        }
+                        if (apiKey) {
+                            request.headers = request.headers || {};
+                            request.headers["X-Api-Key"] = apiKey;
+                        }
+                    } catch (_) {}
+                }
+                return request;
+            }
+            """);
         c.HeadContent = """
             <link rel="icon" type="image/svg+xml" href="/swagger-custom/favicon.svg">
             <link rel="preconnect" href="https://fonts.googleapis.com">

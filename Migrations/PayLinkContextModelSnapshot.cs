@@ -15,7 +15,7 @@ partial class PayLinkContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261119180019_AddBusinessInvoiceProviderKey";
+    public override string LastMigrationId => "20261119235235_RestrictPaymentBusinessDelete";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -93,7 +93,7 @@ partial class PayLinkContextModelSnapshot : ModelSnapshot
                 b.HasOne("UnfathomablePayLink.Models.Business", "Business")
                     .WithMany()
                     .HasForeignKey("BusinessId")
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.Restrict)
                     .IsRequired();
 
                 b.Navigation("Business");

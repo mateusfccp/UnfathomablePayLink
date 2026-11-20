@@ -11,6 +11,8 @@ services:
         value: Production
       - key: Swagger__Enabled
         value: "true"
+      - key: Admin__ApiKey
+        sync: false
       - key: Seed__Enabled
         value: "true"
       - key: Seed__TestBusinessName

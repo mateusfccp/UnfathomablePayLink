@@ -1,6 +1,8 @@
 ﻿namespace UnfathomablePayLink.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UnfathomablePayLink.Authentication;
 using UnfathomablePayLink.DTOs;
 using UnfathomablePayLink.Enums;
 using UnfathomablePayLink.Exceptions;
@@ -12,8 +14,10 @@ using UnfathomablePayLink.Models;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Policy = AuthorizationPolicies.BusinessOnly)]
 [Produces("application/json")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
 public class PaymentsController : ControllerBase
 {
     private readonly IPaymentService _paymentService;

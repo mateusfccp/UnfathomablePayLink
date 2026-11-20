@@ -1,128 +1,90 @@
 @baseUrl = https://localhost:7123
+@adminApiKey = admin-dev-key
+@businessApiKey = testing
 
 ### =============================================================
-### 1. BUSINESSES CRUD (Gestión de Negocios Asociados)
+### 1. BUSINESSES CRUD (Admin Only)
 ### =============================================================
 
 ### 1.1 Read All Businesses
 GET {{baseUrl}}/api/businesses
+X-Api-Key: {{adminApiKey}}
 Accept: application/json
 
-### 1.2 Create a Business
+### 1.2 Create a Business (ApiKey generated server-side)
 POST {{baseUrl}}/api/businesses
+X-Api-Key: {{adminApiKey}}
 Content-Type: application/json
 
 {
   "name": "Acme Corp",
-  "document": "12345678000199"
+  "document": "30-12345678-9",
+  "webhookUrl": "https://example.com/webhook",
+  "invoiceProviderKey": "mock"
 }
 
 ### 1.3 Read Business by ID
 GET {{baseUrl}}/api/businesses/1
+X-Api-Key: {{adminApiKey}}
 Accept: application/json
 
-### 1.4 Update Business
+### 1.4 Update Business (preserves existing ApiKey)
 PUT {{baseUrl}}/api/businesses/1
+X-Api-Key: {{adminApiKey}}
 Content-Type: application/json
 
 {
   "name": "Acme Corporation Updated",
-  "document": "12345678000199"
+  "document": "30-12345678-9",
+  "webhookUrl": "https://example.com/webhook-updated",
+  "invoiceProviderKey": "mock"
 }
 
-### 1.5 Delete Business
-DELETE {{baseUrl}}/api/businesses/1
+### 1.5 Delete Business (blocked with 409 if payments exist)
+DELETE {{baseUrl}}/api/businesses/4
+X-Api-Key: {{adminApiKey}}
 
 ### =============================================================
-### 2. PAYMENTS CRUD (Registro y Administración de Pagos)
+### 2. PAYMENTS (Business Only)
 ### =============================================================
 
 ### 2.1 Read All Payments
 GET {{baseUrl}}/api/payments
+X-Api-Key: {{businessApiKey}}
 Accept: application/json
 
-### 2.2 Create Payment via Body (POST /payments)
+### 2.2 Create Payment
 POST {{baseUrl}}/api/payments
+X-Api-Key: {{businessApiKey}}
 Content-Type: application/json
 
 {
-  "businessId": 1,
-  "invoiceId": "INV-001",
-  "amount": 1500.50,
-  "state": "Approved"
+  "invoiceId": "INV-002"
 }
 
-### 2.3 Create Payment for Business & Invoice (Route)
-POST {{baseUrl}}/api/payments/business/1/invoice/INV-002
-Content-Type: application/json
-
-### 2.4 Read Payment by Transaction ID
+### 2.3 Read Payment by ID
 GET {{baseUrl}}/api/payments/1
+X-Api-Key: {{businessApiKey}}
 Accept: application/json
-
-### 2.5 Consult Payment by Invoice Code
-GET {{baseUrl}}/api/payments/invoice/INV-001
-Accept: application/json
-
-### 2.6 Read Payments by Invoice
-GET {{baseUrl}}/api/payments/business/1/invoice/INV-001
-Accept: application/json
-
-### 2.7 Read Latest Payment for Invoice
-GET {{baseUrl}}/api/payments/business/1/invoice/INV-001/latest
-Accept: application/json
-
-### 2.8 Update Payment (State / Amount)
-PUT {{baseUrl}}/api/payments/1
-Content-Type: application/json
-
-{
-  "amount": 1600.00,
-  "state": "Approved"
-}
-
-### 2.9 Delete Payment
-DELETE {{baseUrl}}/api/payments/1
 
 ### =============================================================
-### 3. INVOICES CRUD (Consulta de Facturas e Integración)
+### 3. WEBHOOK (Business Only)
 ### =============================================================
 
-### 3.1 Read All Invoices
-GET {{baseUrl}}/api/invoices
+### 3.1 Get Webhook URL
+GET {{baseUrl}}/api/webhook
+X-Api-Key: {{businessApiKey}}
 Accept: application/json
 
-### 3.2 Create / Register Invoice
-POST {{baseUrl}}/api/invoices
+### 3.2 Update Webhook URL
+PUT {{baseUrl}}/api/webhook
+X-Api-Key: {{businessApiKey}}
 Content-Type: application/json
 
 {
-  "id": "INV-100",
-  "amount": 2500.00,
-  "description": "Servicio de Hosting Anual",
-  "dueDate": "2026-12-31T23:59:59Z",
-  "isPaid": false
+  "url": "https://example.com/paylink-webhook"
 }
 
-### 3.3 Read Invoice by ID
-GET {{baseUrl}}/api/invoices/INV-001
-Accept: application/json
-
-### 3.4 Consult Invoice for Specific Business
-GET {{baseUrl}}/api/invoices/business/1/invoice/INV-001
-Accept: application/json
-
-### 3.5 Update Invoice
-PUT {{baseUrl}}/api/invoices/INV-100
-Content-Type: application/json
-
-{
-  "id": "INV-100",
-  "amount": 2800.00,
-  "description": "Servicio de Hosting Anual (Actualizado)",
-  "dueDate": "2026-12-31T23:59:59Z",
-  "isPaid": true
-}
-
-### 3.6 Delete Invoice
-DELETE {{baseUrl}}/api/invoices/INV-100
+### 3.3 Delete Webhook URL
+DELETE {{baseUrl}}/api/webhook
+X-Api-Key: {{businessApiKey}}

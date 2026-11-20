@@ -33,6 +33,7 @@ public class PayLinkContext(DbContextOptions<PayLinkContext> options) : DbContex
             entity.HasOne(p => p.Business)
                 .WithMany()
                 .HasForeignKey("BusinessId")
+                .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
         });
     }
