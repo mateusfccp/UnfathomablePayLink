@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using UnfathomablePayLink.Authentication;
@@ -129,6 +130,8 @@ builder.Services.AddDbContext<PayLinkContext>(options =>
     options.UseSqlite(
 	builder.Configuration.GetConnectionString("PayLinkDb")
     );
+    options.ConfigureWarnings(warnings =>
+                  warnings.Ignore(RelationalEventId.NonTransactionalMigrationOperationWarning));
 });
 
 // Options
