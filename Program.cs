@@ -151,18 +151,23 @@ builder.Services.AddSingleton<IPostConfigureOptions<OpenApiOptions>, AdminOpenAp
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-builder.Services.AddHttpClient<IInvoiceRepository, StreamHubInvoiceRepository>((serviceProvider, client) =>
+builder.Services.AddHttpClient<StreamHubInvoiceRepository>((serviceProvider, client) =>
 {
     var options = serviceProvider.GetRequiredService<IOptions<StreamHubOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/'));
     client.Timeout = TimeSpan.FromSeconds(15);
 });
-builder.Services.AddHttpClient<IInvoiceRepository, GobernanzaDigitalInvoiceRepository>((serviceProvider, client) =>
+builder.Services.AddTransient<IInvoiceRepository>(
+    serviceProvider => serviceProvider.GetRequiredService<StreamHubInvoiceRepository>());
+
+builder.Services.AddHttpClient<GobernanzaDigitalInvoiceRepository>((serviceProvider, client) =>
 {
     var options = serviceProvider.GetRequiredService<IOptions<GobernanzaDigitalOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/'));
     client.Timeout = TimeSpan.FromSeconds(15);
 });
+builder.Services.AddTransient<IInvoiceRepository>(
+    serviceProvider => serviceProvider.GetRequiredService<GobernanzaDigitalInvoiceRepository>());
 
 // Services
 builder.Services.AddScoped<IBusinessService, BusinessService>();
@@ -279,7 +284,7 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger
         c.InjectStylesheet("/swagger-custom/apocalypse.css");
         c.InjectJavascript("/swagger-custom/apocalypse.js");
     });
-    app.MapGet("/", () => Results.Redirect("/swagger")).AllowAnonymous().ExcludeFromDescription();
+    app.MapMethods("/", ["GET", "HEAD"], () => Results.Redirect("/swagger")).AllowAnonymous().ExcludeFromDescription();
 }
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).AllowAnonymous().ExcludeFromDescription();
