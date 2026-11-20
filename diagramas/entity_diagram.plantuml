@@ -1,29 +1,25 @@
 @startuml
 
-entity Business {
-	* id : integer (generated)
+entity Businesses {
+	* Id : INTEGER <<PK, generated>>
 	--
-	* name : varchar
-	* identifier : varchar (unique)
+	* Name : TEXT
+	* Document : TEXT <<UNIQUE>>
+	* ApiKey : TEXT <<UNIQUE>>
+	  WebhookUrl : TEXT <<nullable>>
+	* InvoiceProviderKey : TEXT <<default: "mock">>
 }
 
-entity Payment {
-	* id : number (generated)
+entity Payments {
+	* Id : INTEGER <<PK, generated>>
 	--
-	* business_id : integer (FK)
-	* invoice_id : varchar
-	* amount : integer
-	* payment_state : integer (FK)
-	* payment_date : text
+	* BusinessId : INTEGER <<FK>>
+	* InvoiceId : TEXT
+	* Amount : DECIMAL (TEXT in SQLite)
+	* State : TEXT <<Approved | Rejected | Pending>>
+	  PaymentDate : DATETIME (TEXT, nullable)
 }
 
-entity PaymentState {
-	* id : number (generated)
-	--
-	* name : string
-}
-
-Payment }o--|| Business
-Payment }o--|| PaymentState
+Payments }o--|| Businesses : "BusinessId (ON DELETE RESTRICT)"
 
 @enduml
